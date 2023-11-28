@@ -21,6 +21,12 @@ module.exports = {
       transparent: "transparent",
       current: "currentColor",
     },
+    extend:{
+      colors:{
+        darkmode:"#001531",
+        lightmode:"#fafafa",
+      },
+    },
   },
   plugins: [],
 }

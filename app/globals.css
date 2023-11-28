@@ -16,3 +16,8 @@
   }
 } */
 
+@layer base{
+  body {
+      @apply dark:bg-darkmode bg-lightmode
+  }
+}

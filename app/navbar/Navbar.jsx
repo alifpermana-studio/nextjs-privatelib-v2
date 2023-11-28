@@ -130,7 +130,7 @@ const Navbar = (props) => {
                 onClick={() => setTheme("light")}
                 alt="Light Mode"
               >
-                <div className="relative top-1">
+                <div className="relative top-0">
                   <Image src="/sun.svg" alt="logo" height="30" width="30" />
                 </div>
               </button>
