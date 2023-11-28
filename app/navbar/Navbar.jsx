@@ -58,7 +58,7 @@ const Navbar = (props) => {
         }}
         className=" mx-auto"
       >
-        <div className=" relative flex items-center  top-0 m-0  px-8 py-0.5  text-white">
+        <div className=" relative flex flex-row items-center top-0 m-0  px-8 py-0.5  text-white">
           <Link href="/">
             <h1
               style={{ color: `${textColor}` }}
@@ -140,7 +140,7 @@ const Navbar = (props) => {
                 onClick={() => setTheme("dark")}
                 alt="Dark Mode"
               >
-                <div className="relative top-1">
+                <div className="relative top-0">
                   <Image src="/moon.svg" alt="logo" height="30" width="30" />
                 </div>
               </button>
@@ -148,13 +148,13 @@ const Navbar = (props) => {
 
             <Menu>
               <Menu.Button>
-                <div className="relative inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-2 py-0 px-1 mx-3">
-                  <div className="relative top-1">
+                <div className="relative inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-3 py-0 px-1 mx-3">
+                  <div className="relative my-1 w-5 h-5">
                     <Image
                       src="/blankAvatar.svg"
                       alt="logo"
-                      height="30"
-                      width="30"
+                      height="50"
+                      width="50"
                     />
                   </div>
                 </div>
@@ -212,7 +212,7 @@ const Navbar = (props) => {
           {/* Mobile Menu */}
           <Menu>
             <Menu.Button>
-              <div className="relative sm:hidden inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-2 py-0 px-1 mx-3">
+              <div className="relative sm:hidden inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-3 py-0 px-1 mx-3">
                 <div className="relative top-1">
                   <Image
                     src="/blankAvatar.svg"
