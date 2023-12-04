@@ -62,7 +62,7 @@ const Navbar = (props) => {
           <Link href="/">
             <h1
               style={{ color: `${textColor}` }}
-              className="font-bold text-4xl"
+              className="font-bold"
             >
               Alif Pustaka{" "}
             </h1>
