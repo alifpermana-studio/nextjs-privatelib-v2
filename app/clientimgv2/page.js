@@ -56,7 +56,7 @@ export default function UploadForm() {
             })
 
             // handle the error
-            if (!resPost.ok) throw new Error(await resPost)
+            if (!resPost.ok) throw new Error(await resPost.text())
             setReload(true)
         } catch (err) {
             // Handle errors here
