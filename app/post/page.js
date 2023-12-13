@@ -7,8 +7,7 @@ import { EditorTinyMCE } from './Editor'
 import { PostSEO } from './PostItem'
 import { useRef, useState } from 'react'
 import Keyword from './Keyword'
-import styles from './page.module.css'
-
+import MainPic from './MainPic'
 
 function Post() {
     const editorRef = useRef(null);
@@ -78,6 +77,7 @@ function Post() {
             <PostSEO onChanged={handleChange} />
             <EditorTinyMCE />
             <Keyword onChanged={handleChange} />
+            <MainPic/>
             <button
                 type="submit"
                 onClick={postPage}
