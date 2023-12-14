@@ -55,6 +55,8 @@ export default function UploadForm() {
                 body: data
             })
 
+            console.log(resPost);
+            
             // handle the error
             if (!resPost.ok) throw new Error(await resPost.text())
             setReload(true)
