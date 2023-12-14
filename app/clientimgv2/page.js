@@ -55,7 +55,7 @@ export default function UploadForm() {
                 body: data
             })
 
-            console.log(resPost);
+            console.log(const {success}= await resPost.json());
             
             // handle the error
             if (!resPost.ok) throw new Error(await resPost.text())
