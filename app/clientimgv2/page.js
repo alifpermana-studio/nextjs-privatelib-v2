@@ -54,6 +54,10 @@ export default function UploadForm() {
                 method: 'POST',
                 body: data
             })
+            
+            const {success}=resPost
+
+            console.log(success);
 
             // handle the error
             if (!resPost.ok) throw new Error(await resPost.text())
@@ -69,7 +73,7 @@ export default function UploadForm() {
     return (
         <div className='relative'>
             <Navbar />
-            <div className={(popUp) ? " flex flex-col fixed bg-red-900 items-center w-screen" : "hidden"}>
+            <div className={(popUp) ? "z-10 flex flex-col fixed bg-red-900 items-center w-screen" : "hidden"}>
                 <div className=' absolute opacity-60 bg-gray-500 w-screen h-screen'>
 
                 </div>
