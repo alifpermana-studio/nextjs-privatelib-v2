@@ -92,10 +92,10 @@ export default function UploadForm() {
                                 <div className='text-2xl'>
                                     Your Collection
                                 </div>
-                                <div className='flex flex-row items-center p-0 m-0 flex-wrap justify-start overflow-y-auto  w-[870px] h-[400px]'>
+                                <div className='flex flex-row p-0 m-0 flex-wrap justify-start content-start overflow-y-auto  w-[880px] h-[400px]'>
                                     {image.map((image, i) => (
                                         <button key={i} className='border border-cyan-500 m-1 focus:bg-slate-50 focus:ring' onClick={() => setImgSubmit(image.fileName)}>
-                                            <Image className='h-48 w-48 object-contain' src={"https://ik.imagekit.io/alifpermanastudio/" + image.fileName} alt={image.fileName} width={200} height={100} />
+                                            <Image className='h-40 w-40 object-contain' src={"https://ik.imagekit.io/alifpermanastudio/" + image.fileName} alt={image.fileName} width={200} height={100} />
                                         </button>
                                     ))}
                                 </div>
@@ -148,8 +148,8 @@ export default function UploadForm() {
                             </div>
                         </div>
                         <div className='flex flex-row content-center justify-center p-2'>
-                        <button type="button" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800" onClick={closePopUp}>Cancel</button>
-                        <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Submit</button>
+                        <button type="button" className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800" onClick={closePopUp}>Cancel</button>
+                        <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Submit</button>
                         </div>
                     </div>
                 </div>

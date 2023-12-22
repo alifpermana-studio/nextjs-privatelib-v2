@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap');
 
 /* :root {
   --foreground-rgb: 0, 0, 0;
@@ -18,6 +19,8 @@
 
 @layer base{
   body {
-      @apply dark:bg-darkmode bg-lightmode
+    font-family: 'Josefin Sans', sans-serif;
+    
+    @apply dark:bg-darkmode bg-lightmode
   }
 }

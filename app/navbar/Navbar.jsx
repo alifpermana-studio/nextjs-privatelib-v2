@@ -16,7 +16,7 @@ const Navbar = (props) => {
   const [nav, setNav] = useState(true);
   const [color, setColor] = useState("transparent");
   const [textColor, setTextColor] = useState("white");
-  const {systemTheme, theme, setTheme } = useTheme();
+  const { systemTheme, theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const refOne = useRef(null);
 
@@ -47,7 +47,7 @@ const Navbar = (props) => {
     <div
       style={{ backgroundColor: `${color}` }}
       className={
-        "shrink w-full fixed inset-x-0 top-0 h-auto m-0 z-50 ease-in duration-300 "
+        " shrink w-full fixed inset-x-0 top-0 h-auto m-0 z-50 ease-in duration-300 "
       }
     >
       <div
