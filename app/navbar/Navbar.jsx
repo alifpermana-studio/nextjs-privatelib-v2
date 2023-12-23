@@ -1,5 +1,5 @@
 "use client";
-import styles from "./Navbar.module.css";
+import { Poppins } from "next/font/google";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import Image from "next/image";
@@ -7,6 +7,8 @@ import { Menu, Popover, Transition } from "@headlessui/react";
 import { BiSearchAlt } from "react-icons/bi";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { useTheme } from "next-themes";
+
+const poppins = Poppins({  weight: ['400', '700'], subsets: ['latin'] })
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -47,16 +49,18 @@ const Navbar = (props) => {
     <div
       style={{ backgroundColor: `${color}` }}
       className={
-        " shrink w-full fixed inset-x-0 top-0 h-auto m-0 z-50 ease-in duration-300 "
+        " shrink w-full fixed inset-x-0 top-0 h-auto m-0 z-50 ease-in duration-300"
       }
     >
       <div
         style={{
-          fontFamily: "Roboto",
-          fontWeight: "600",
+          fontSize:"18px",
           backdropFilter: "blur(10px)",
+          maxWidth:"1280px",
+          marginLeft:"auto",
+          marginRight:"auto"
         }}
-        className=" mx-auto"
+        className={poppins.className}
       >
         <div className=" relative flex flex-row items-center top-0 m-0  px-8 py-0.5  text-white">
           <Link href="/">
