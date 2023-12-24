@@ -3,7 +3,9 @@ const { Schema } = mongoose;
 
 const imageKitSchema = new Schema({
   fileName: String, // String is shorthand for {type: String}
-  category: String,
+  uploadDate: String,
+  permalink:String,
+  tags:Array,
 });
 
-module.exports = mongoose.models.IK_Collection || mongoose.model('IK_Collection', imageKitSchema) 
+module.exports = mongoose.models.ImageKit_Lib || mongoose.model('ImageKit_Lib', imageKitSchema) 

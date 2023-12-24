@@ -1,7 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
 import ImageKit from "imagekit";
 import { NextRequest, NextResponse } from 'next/server'
-import IK_Collection from "@/models/ImageKit"
+import ImageKit_Lib from "@/models/ImageKit"
 
 const imagekit = new ImageKit({
     urlEndpoint: process.env.NEXT_PUBLIC_IK_ENDPOINT1,
@@ -31,19 +31,18 @@ export async function POST(req) {
     let monthSliced = month.slice(-2)
     let year = "0" + (new Date().getYear())
     let yearSliced = year.slice(-2)
-    let mergeTitle= hourSliced + minuteSliced + secondsSliced + "_" + day + monthSliced + yearSliced + "_exp"
+    let mergeTitle= hourSliced + minuteSliced + secondsSliced + "_" + day + monthSliced + yearSliced
 
     imagekit.upload({
-        file: data, //required
-        fileName: mergeTitle,   //required
+        file: data.imageData, //required
+        fileName: data.permalink,   //required
         useUniqueFileName:false,
-        tags: ["tag1", "tag2"]
     }, function (error, result) {
         if (error) console.log(error);
         /* else console.log(result); */
     });
+    
+    const imageDbRegist= await ImageKit_Lib.create({ fileName: data.title, uploadDate: mergeTitle, permalink:data.permalink, tags: data.tags })
 
-    const imageDbRegist= await IK_Collection.create({ fileName: mergeTitle, category: "general" })
-
-    return NextResponse.json({ success: true, imagekitStatus: imagekit })
+    return NextResponse.json({ success: true, imageKitStatus: data.title })
 }

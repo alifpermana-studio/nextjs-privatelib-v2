@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Navbar from '../navbar/Navbar'
-import LoremIpsum from '@/component/LoremIpsum'
+
+const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1
 
 export default function UploadForm() {
     const [popUp, setPopUp] = useState(false)
@@ -12,7 +13,20 @@ export default function UploadForm() {
     const [selectedImage, setSelectedImage] = useState()
     const [selectedFile, setSelectedFile] = useState("empty")
     const [uploading, setUploading] = useState(false)
-    const [imgSubmit, setImgSubmit] = useState()
+    const [imgSubmit, setImgSubmit] = useState(
+        {
+            fileName:"Select your image",
+            permalink: "dummy-image.jpg",
+            tags: "Select your image",
+        }
+    )
+    const [libTab, setLibTab] = useState(true)
+    const [upTab, setUpTab] = useState(false)
+    const [tag, setTag] = useState()
+    const [tags, setTags] = useState([])
+    const [title, setTitle] = useState("")
+    const [permalink, setPermalink] = useState("")
+    const [uploadImage, setUploadImage] = useState("")
 
     useEffect(() => {
         let loadImg = true
@@ -25,18 +39,17 @@ export default function UploadForm() {
             const { result } = await resGet.json()
 
             if (loadImg) {
-                setImage(result)
-                console.log(result);
+                setImage(result.reverse())
+                /* console.log(result); */
             }
         }
 
         setTimeout(() => {
             getImage().catch(console.error)
-        }, 3000)
-
+        }, 4000)
 
         return () => loadImg = false
-    }, [reload])
+    }, [reload, /* image */])
 
     const openPopUp = () => {
         setPopUp(true)
@@ -46,11 +59,41 @@ export default function UploadForm() {
         setPopUp(false)
     }
 
+    const imageCollection = () => {
+        setLibTab(true)
+        setUpTab(false)
+    }
+
+    const imageUpload = () => {
+        setUpTab(true)
+        setLibTab(false)
+    }
+
     const imageDrag = (e) => {
         e.preventDefault()
     }
 
-    const imageDrop = (target) => {
+    const newTag = () => {
+
+        if (tag) {
+            setTags((prevTags) => {
+
+                return ([...prevTags, tag.replace(/ /g,"-")])
+            })
+
+            setTag()
+        }
+
+
+
+        /* console.log(tags); */
+    }
+    const deleteTags = (e) => {
+        const delTag = e.target.alt
+        setTags(tags.filter(tag => tag !== delTag))
+    }
+
+    /* const imageDrop = (target) => {
         if (target.files) {
             const file = target.files?.[0]
             var binaryData = [];
@@ -65,23 +108,44 @@ export default function UploadForm() {
             if (file) {
                 setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
             }
-            /* console.log(file); */
+            
         }
-    }
+    } */
+    useEffect(() => {
+        if(!permalink){
+            const permalink=title.replace(/ /g,"-")
+            setUploadImage({
+                title: title,
+                permalink: permalink,
+                tags: tags,
+                imageData: selectedFile,
+            })
+        }else{
+            setUploadImage({
+                title: title,
+                permalink: permalink,
+                tags: tags,
+                imageData: selectedFile,
+            })
+        }
+        
+    }, [title, permalink, tags, selectedFile])
 
     const onUpload = async (e) => {
         setUploading(true)
         e.preventDefault()
         if (!selectedFile) return
 
+        /* console.log(uploadImage); */
+
         try {
             const resPost = await fetch('/api/imagekit', {
                 method: 'POST',
-                body: JSON.stringify(selectedFile),
+                body: JSON.stringify(uploadImage),
             })
 
-            const { success } = await resPost.json()
-            console.log(success);
+            const { imageKitStatus } = await resPost.json()
+            console.log(imageKitStatus);
 
             // handle the error
             if (!resPost.ok) {
@@ -94,13 +158,18 @@ export default function UploadForm() {
         }
 
         setReload(true)
-        setUploading(false)
+        setTitle("")
+        setPermalink("")
+        setTags([])
         setSelectedImage()
+        setUploading(false)
     }
 
     const handleSubmit = () => {
-        console.log(imgSubmit);
+        console.log(imgSubmit)
     }
+
+    /* console.log(tags); */
 
     return (
         <div className='relative'>
@@ -109,101 +178,163 @@ export default function UploadForm() {
                 <div className=' absolute opacity-60 bg-gray-500 w-screen h-screen'>
                 </div>
                 <div className='absolute pt-6 w-[1200px] h-[520px]'>
-                    <div className='dark:bg-darkmode bg-white p-2 mx-auto'>
-                        <div className='flex flex-row justify-center'>
-                            <div className='flex flex-col basis-2/3 p-2'>
-                                <div className='text-2xl'>
-                                    Your Collection
-                                </div>
-                                <div className='flex flex-row p-0 m-0 flex-wrap justify-start content-start overflow-y-auto  w-[880px] h-[400px]'>
-                                    {image.map((image, i) => (
-                                        <button key={i} className='border border-cyan-500 m-1 focus:bg-slate-50 focus:ring' onClick={() => setImgSubmit(image.fileName)}>
-                                            <Image className='h-40 w-40 object-contain' src={"https://ik.imagekit.io/alifpermanastudio/" + image.fileName} alt={image.fileName} width={200} height={100} />
-                                        </button>
-                                    ))}
-                                </div>
+                    <div className='flex flex-col dark:bg-darkmode bg-white p-2 mx-auto item-center'>
+                        <div className='text-xl py-2 mx-auto'>Media Library</div>
+                        <div className='flex flex-col item-center'>
+                            <div className="pl-4 text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+                                <ul className="flex flex-row gap-6 justify-left text-base">
+                                    <li>
+                                        <button onClick={imageCollection} aria-pressed={(libTab) ? "true" : "false"} className="inline-block pb-1 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:text-gray-300 aria-pressed:font-extrabold aria-pressed:border-gray-300">Image Collection</button>
+                                    </li>
+                                    <li>
+                                        <button onClick={imageUpload} aria-pressed={(upTab) ? "true" : "false"} className="inline-block pb-1 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:text-gray-300 aria-pressed:font-extrabold aria-pressed:border-gray-300" >Image Upload</button>
+                                    </li>
+
+                                </ul>
                             </div>
-                            <div className='flex flex-col basis-1/3  p-1 pl-3 m-2'>
-                                <div className='text-2xl'
-                                    >
-                                    Upload Image
-                                </div>
-                                <label
-                                    className='w-40 relative h-40 mb-1 aspect-video rounded-xl flex items-center justify-center border-[3px] border-gray-400 border-dashed cursor-pointer p-1'
-                                    onDragOver={
-                                        (e) => {
-                                           e.preventDefault()                                            
-                                        }
-                                    }
-                                    onDrop={
-                                        (e) => {
-                                            e.preventDefault()
-                                            if (e.dataTransfer.files) {
-                                                const file = e.dataTransfer.files?.[0]
-                                                var binaryData = [];
-                                                binaryData.push(file);
-                                                const reader = new FileReader();
-                                                if (file) {
-                                                    reader.readAsDataURL(file)
-                                                    reader.onloadend = () => {
-                                                        setSelectedFile(reader.result)
-                                                    }
-                                                }
-                                                if (file) {
-                                                    setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
-                                                }
-                                                console.log(file);
-                                            }
-                                        }
-                                    }
-                                >
-                                    <input
-                                        type="file"
-                                        hidden
-                                        onChange={({ target }) => {
-                                            if (target.files) {
-                                                const file = target.files?.[0]
-                                                var binaryData = [];
-                                                binaryData.push(file);
-                                                const reader = new FileReader();
-                                                if (file) {
-                                                    reader.readAsDataURL(file)
-                                                    reader.onloadend = () => {
-                                                        setSelectedFile(reader.result)
-                                                    }
-                                                }
-                                                if (file) {
-                                                    setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
-                                                }
-                                                /* console.log(file); */
-                                            }
-                                        }}
-
-                                    />
-
-                                    <div className=""
-                                    >
-                                        {selectedImage ? (
-                                            <Image src={selectedImage} alt="" fill={true} style={{ objectFit: "contain" }} />
-                                        ) : (
-                                            <span>Select Image</span>
-                                        )}
+                            <div className='flex flex-row justify-center'>
+                                <div className={(libTab) ? 'flex flex-row  p-2 gap-4 w-full' : 'hidden'}>
+                                    <div className='flex flex-row p-0 m-0 flex-wrap justify-start content-start overflow-y-auto  basis-8/12 h-[340px]'>
+                                        {image.map((image, i) => (
+                                            <button key={i} className='border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring' onClick={() => setImgSubmit(image)}>
+                                                <Image className='h-32 w-32 object-contain' src={iKUrlEndpoint + "/" + image.permalink} alt={image.fileName} width={200} height={100} />
+                                                <p>{image.fileName.slice(0, 12)}</p>
+                                            </button>
+                                        ))}
                                     </div>
-                                </label>
+                                    <div className='flex flex-col basis-4/12 pr-2 gap-1 overflow-y-auto h-[340px]'>
+                                        <h1 className='text-xl'>Detail :</h1>
+                                        <div className=' p-1 mb-2 w-auto mx-auto border border-cyan-200'>
+                                            <Image className='h-auto max-h-72 w-full object-contain' src={iKUrlEndpoint + "/" + imgSubmit.permalink} alt={imgSubmit.fileName} width={200} height={100} />
+                                        </div>
+                                        <p>Title :</p>
+                                        <input placeholder="Select your image" value={imgSubmit.fileName} />
+                                        <p>Permalink :</p>
+                                        <input placeholder="Select your image" value={imgSubmit.permalink} />
+                                        <p>Tag :</p>
+                                        <div className='flex flex-wrap'>
+                                            {imgSubmit.tags.map((tag, i) => {
+                                                return (
+                                                    <div key={i} className='flex flex-row bg-blue-500 m-1 rounded-md'>
+                                                        <div className='px-2'>{tag}</div>
+                                                        <div className='flex flex-row rounded-r-md px-2 bg-red-600' onClick={deleteTags} value={tag}>
+                                                            <Image className="h-4 w-4 m-auto" src='/cross-sign.svg' alt={tag || ""} width={1} height={1} />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
 
-                                <button
-                                    onClick={onUpload}
-                                    disabled={uploading}
-                                    style={{ opacity: uploading ? ".5" : "1" }}
-                                    className=" bg-red-600 p-3 w-32 text-center rounded text-white"
-                                >
-                                    {uploading ? "Uploading.." : "Upload"}
-                                </button>
+                                    </div>
+                                </div>
+                                <div className={(upTab) ? 'flex flex-row justify-start h-[350px] p-2 w-full gap-4' : 'hidden'}>
+                                    <div className='flex flex-col items-start p-1 basis-3/6'>
+                                        <div className='text-xl pb-2'
+                                        >
+                                            Select your image
+                                        </div>
+                                        <label
+                                            className='w-full relative h-full mb-1 aspect-video rounded-xl flex items-center justify-center border-[3px] border-gray-400 border-dashed cursor-pointer p-1'
+                                            onDragOver={
+                                                (e) => {
+                                                    e.preventDefault()
+                                                }
+                                            }
+                                            onDrop={
+                                                (e) => {
+                                                    e.preventDefault()
+                                                    if (e.dataTransfer.files) {
+                                                        const file = e.dataTransfer.files?.[0]
+                                                        var binaryData = [];
+                                                        binaryData.push(file);
+                                                        const reader = new FileReader();
+                                                        if (file) {
+                                                            reader.readAsDataURL(file)
+                                                            reader.onloadend = () => {
+                                                                setSelectedFile(reader.result)
+                                                            }
+                                                        }
+                                                        if (file) {
+                                                            setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
+                                                        }
+                                                        /* console.log(file); */
+                                                    }
+                                                }
+                                            }
+                                        >
+                                            <input
+                                                type="file"
+                                                hidden
+                                                onChange={({ target }) => {
+                                                    if (target.files) {
+                                                        const file = target.files?.[0]
+                                                        var binaryData = [];
+                                                        binaryData.push(file);
+                                                        const reader = new FileReader();
+                                                        if (file) {
+                                                            reader.readAsDataURL(file)
+                                                            reader.onloadend = () => {
+                                                                setSelectedFile(reader.result)
+                                                            }
+                                                        }
+                                                        if (file) {
+                                                            setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
+                                                        }
+                                                        /* console.log(file); */
+                                                    }
+                                                }}
+
+                                            />
+
+                                            <div className=""
+                                            >
+                                                {selectedImage ? (
+                                                    <Image src={selectedImage} alt="" fill={true} style={{ objectFit: "contain" }} />
+                                                ) : (
+                                                    <Image src={"/dummy-upload.svg"} alt="Upload Image" width={100} height={100} />
+                                                )}
+                                            </div>
+                                        </label>
+
+                                    </div>
+                                    <div className='flex flex-col pt-10 item-start text-lg gap-1 basis-3/6 overflow-y-auto'>
+                                        <p>Title :</p>
+                                        <input placeholder='Your title' onChange={(e) => setTitle(e.target.value)} value={title || ""} />
+                                        <p>Permalink :</p>
+                                        <input placeholder={title.replace(/ /g,"-")} onChange={(e) => setPermalink(e.target.value)} value={permalink || ""} />
+                                        <p>Tags :</p>
+                                        <div className=' flex flex-row'>
+                                            <input type="text" placeholder='Your tag' onChange={(e) => { setTag(e.target.value) }} value={tag || ''} />
+                                            <button className='bg-blue-400 px-2' onClick={newTag}>Add</button>
+                                        </div>
+                                        <div className='flex flex-wrap'>
+                                            {tags.map((tag, i) => {
+                                                return (
+                                                    <div key={i} className='flex flex-row bg-blue-500 m-1 rounded-md'>
+                                                        <div className='px-2'>{tag}</div>
+                                                        <div className='flex flex-row rounded-r-md px-2 bg-red-600' onClick={deleteTags} value={tag}>
+                                                            <Image className="h-4 w-4 m-auto" src='/cross-sign.svg' alt={tag || ""} width={1} height={1} />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+
+                                        <button
+                                            onClick={onUpload}
+                                            disabled={uploading}
+                                            style={{ opacity: uploading ? ".5" : "1" }}
+                                            className=" bg-red-600 p-3 w-32 text-center rounded text-white"
+                                        >
+                                            {uploading ? "Uploading.." : "Upload"}
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className='flex flex-row content-center justify-center p-2'>
                             <button type="button" className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800" onClick={closePopUp}>Cancel</button>
-                            <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Submit</button>
+                            <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={handleSubmit}>Submit</button>
                         </div>
                     </div>
                 </div>
