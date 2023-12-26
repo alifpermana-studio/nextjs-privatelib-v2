@@ -26,7 +26,7 @@ export default function UploadForm() {
         }
     )
     const [imageDetail, setImageDetail] = useState("dummy-image.jpg")
-    const [imgUpdate, setImgUpdate] = useState({
+    const [updateImage, setUpdateImage] = useState({
         action: "Update",
         update: false,
         tags: []
@@ -36,13 +36,9 @@ export default function UploadForm() {
     const [tag, setTag] = useState()
     const [tags, setTags] = useState([])
     const [updateTag, setUpdateTag] = useState()
-    const [updateTags, setUpdateTags] = useState([])
     const [title, setTitle] = useState("")
     const [permalink, setPermalink] = useState("")
-    const [updateTitle, setUpdateTitle] = useState("")
-    const [updatePermalink, setUpdatePermalink] = useState("")
     const [uploadImage, setUploadImage] = useState("")
-    const [updateImage, setUpdateImage] = useState("")
 
     useEffect(() => {
         let loadImg = true
@@ -85,10 +81,6 @@ export default function UploadForm() {
         setLibTab(false)
     }
 
-    const imageDrag = (e) => {
-        e.preventDefault()
-    }
-
     const newTag = () => {
 
         if (tag) {
@@ -121,24 +113,6 @@ export default function UploadForm() {
 
     }
 
-    /* const imageDrop = (target) => {
-        if (target.files) {
-            const file = target.files?.[0]
-            var binaryData = [];
-            binaryData.push(file);
-            const reader = new FileReader();
-            if (file) {
-                reader.readAsDataURL(file)
-                reader.onloadend = () => {
-                    setSelectedFile(reader.result)
-                }
-            }
-            if (file) {
-                setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
-            }
-            
-        }
-    } */
     useEffect(() => {
         if (!permalink) {
             const permalink = title.replace(/ /g, "-")
@@ -165,8 +139,6 @@ export default function UploadForm() {
         setUploading(true)
         e.preventDefault()
         if (!selectedFile) return
-
-        /* console.log(uploadImage); */
 
         try {
             const resPost = await fetch('/api/imagekit', {
@@ -200,26 +172,6 @@ export default function UploadForm() {
         setPopUp(false)
     }
 
-    /* useEffect(() => {
-        if (!updatePermalink) {
-            const updatePermalink = updateTitle.replace(/ /g, "-")
-            setUpdateImage({
-                title: updateTitle,
-                permalink: updatePermalink,
-                tags: updateTags,
-                action: "Update",
-            })
-        } else {
-            setUpdateImage({
-                title: updateTitle,
-                permalink: updatePermalink,
-                tags: updateTags,
-                action: "Update",
-            })
-        }
-
-    }, [updateTitle, updatePermalink, updateTags]) */
-
     const deleteImg = async (e) => {
         const imgDelete = {
             action: "Delete",
@@ -233,8 +185,6 @@ export default function UploadForm() {
 
         setUploading(true)
         e.preventDefault()
-
-        /* console.log(uploadImage); */
 
         try {
             const resPost = await fetch('/api/imagekit', {
@@ -290,7 +240,6 @@ export default function UploadForm() {
     }
 
     const updateImg = async (e) => {
-        /* console.log(imgUpdate); */
 
         setUploading(true)
         e.preventDefault()
@@ -298,7 +247,7 @@ export default function UploadForm() {
         try {
             const resPost = await fetch('/api/imagekit', {
                 method: 'POST',
-                body: JSON.stringify(imgUpdate),
+                body: JSON.stringify(updateImage),
             })
 
             const { imageKitStatus } = await resPost.json()
@@ -329,7 +278,7 @@ export default function UploadForm() {
             return {
                 title: prevValue.title,
                 permalink: prevValue.permalink,
-                tags: [...prevValue.tags, updateTag],
+                tags: [...prevValue.tags, updateTag.replace(/ /g, "-")],
                 fileId: prevValue.fileId
             }
         })
@@ -344,7 +293,7 @@ export default function UploadForm() {
     }
 
     useEffect(() => {
-        setImgUpdate({
+        setUpdateImage({
             action: "Update",
             update: true,
             title: imgSubmit.title,
@@ -392,16 +341,16 @@ export default function UploadForm() {
                                             <Image className='h-auto max-h-72 w-full object-contain' src={iKUrlEndpoint + "/" + imageDetail} alt={imageDetail} width={200} height={100} />
                                         </div>
                                         <p>Title :</p>
-                                        <input name="titleUpdate" placeholder="Select your image" value={(imgUpdate.update) ? imgUpdate.title : imgSubmit.title} onChange={handleUpdate} />
+                                        <input name="titleUpdate" placeholder="Select your image" value={(updateImage.update) ? updateImage.title : imgSubmit.title} onChange={handleUpdate} />
                                         <p>Permalink :</p>
-                                        <input name="permalinkUpdate" placeholder="Select your image" value={(imgUpdate.update) ? imgUpdate.permalink : imgSubmit.permalink} onChange={handleUpdate} />
+                                        <input name="permalinkUpdate" placeholder="Select your image" value={(updateImage.update) ? updateImage.permalink : imgSubmit.permalink} onChange={handleUpdate} />
                                         <p>Tag :</p>
                                         <div className='flex flex-row'>
                                             <input type="text" placeholder='Your tag' onChange={(e) => { setUpdateTag(e.target.value) }} value={updateTag || ''} />
                                             <button className='bg-blue-400 px-2' onClick={newUpdateTag}>Add</button>
                                         </div>
                                         <div className='flex flex-wrap'>
-                                            {imgUpdate.tags.map((tag, i) => {
+                                            {updateImage.tags.map((tag, i) => {
                                                 return (
                                                     <div key={i} className='flex flex-row bg-blue-500 m-1 rounded-md'>
                                                         <div className='px-2'>{tag}</div>
