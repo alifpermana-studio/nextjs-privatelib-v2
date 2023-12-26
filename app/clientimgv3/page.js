@@ -8,25 +8,41 @@ const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1
 
 export default function UploadForm() {
     const [popUp, setPopUp] = useState(false)
-    const [image, setImage] = useState([])
+    const [image, setImage] = useState([
+        {
+            title: "Loading ...",
+            permalink: "dummy-image.jpg"
+        }
+    ])
     const [reload, setReload] = useState()
     const [selectedImage, setSelectedImage] = useState()
     const [selectedFile, setSelectedFile] = useState("empty")
     const [uploading, setUploading] = useState(false)
     const [imgSubmit, setImgSubmit] = useState(
         {
-            fileName:"Select your image",
+            title: "Select your image",
             permalink: "dummy-image.jpg",
-            tags: "Select your image",
+            tags: [],
         }
     )
+    const [imageDetail, setImageDetail] = useState("dummy-image.jpg")
+    const [imgUpdate, setImgUpdate] = useState({
+        action: "Update",
+        update: false,
+        tags: []
+    })
     const [libTab, setLibTab] = useState(true)
     const [upTab, setUpTab] = useState(false)
     const [tag, setTag] = useState()
     const [tags, setTags] = useState([])
+    const [updateTag, setUpdateTag] = useState()
+    const [updateTags, setUpdateTags] = useState([])
     const [title, setTitle] = useState("")
     const [permalink, setPermalink] = useState("")
+    const [updateTitle, setUpdateTitle] = useState("")
+    const [updatePermalink, setUpdatePermalink] = useState("")
     const [uploadImage, setUploadImage] = useState("")
+    const [updateImage, setUpdateImage] = useState("")
 
     useEffect(() => {
         let loadImg = true
@@ -40,13 +56,13 @@ export default function UploadForm() {
 
             if (loadImg) {
                 setImage(result.reverse())
-                /* console.log(result); */
+                console.log(result);
             }
         }
 
         setTimeout(() => {
             getImage().catch(console.error)
-        }, 4000)
+        }, 5000)
 
         return () => loadImg = false
     }, [reload, /* image */])
@@ -78,19 +94,31 @@ export default function UploadForm() {
         if (tag) {
             setTags((prevTags) => {
 
-                return ([...prevTags, tag.replace(/ /g,"-")])
+                return ([...prevTags, tag.replace(/ /g, "-")])
             })
-
             setTag()
         }
-
-
-
         /* console.log(tags); */
     }
+
     const deleteTags = (e) => {
         const delTag = e.target.alt
         setTags(tags.filter(tag => tag !== delTag))
+    }
+
+    const deleteUpdateTag = (e) => {
+        const delTag = e.target.alt
+        /* setUpdateTags(updateTag.filter(updateTag => updateTag !== delTag)) */
+
+        setImgSubmit((prevValue) => {
+            return {
+                title: prevValue.title,
+                permalink: prevValue.permalink,
+                tags: prevValue.tags.filter(updateTag => updateTag !== delTag),
+                fileId: prevValue.fileId
+            }
+        })
+
     }
 
     /* const imageDrop = (target) => {
@@ -112,23 +140,25 @@ export default function UploadForm() {
         }
     } */
     useEffect(() => {
-        if(!permalink){
-            const permalink=title.replace(/ /g,"-")
+        if (!permalink) {
+            const permalink = title.replace(/ /g, "-")
             setUploadImage({
                 title: title,
                 permalink: permalink,
                 tags: tags,
                 imageData: selectedFile,
+                action: "Upload",
             })
-        }else{
+        } else {
             setUploadImage({
                 title: title,
                 permalink: permalink,
                 tags: tags,
                 imageData: selectedFile,
+                action: "Upload",
             })
         }
-        
+
     }, [title, permalink, tags, selectedFile])
 
     const onUpload = async (e) => {
@@ -147,6 +177,74 @@ export default function UploadForm() {
             const { imageKitStatus } = await resPost.json()
             console.log(imageKitStatus);
 
+            setReload(true)
+
+            // handle the error
+            if (!resPost.ok) {
+                throw new Error(await resPost.text())
+            }
+        } catch (err) {
+            // Handle errors here
+            console.error(err)
+        }
+
+        setTitle("")
+        setPermalink("")
+        setTags([])
+        setSelectedImage()
+        setUploading(false)
+    }
+
+    const handleSubmit = () => {
+        console.log(imgSubmit)
+        setPopUp(false)
+    }
+
+    /* useEffect(() => {
+        if (!updatePermalink) {
+            const updatePermalink = updateTitle.replace(/ /g, "-")
+            setUpdateImage({
+                title: updateTitle,
+                permalink: updatePermalink,
+                tags: updateTags,
+                action: "Update",
+            })
+        } else {
+            setUpdateImage({
+                title: updateTitle,
+                permalink: updatePermalink,
+                tags: updateTags,
+                action: "Update",
+            })
+        }
+
+    }, [updateTitle, updatePermalink, updateTags]) */
+
+    const deleteImg = async (e) => {
+        const imgDelete = {
+            action: "Delete",
+            update: true,
+            title: imgSubmit.title,
+            permalink: imgSubmit.permalink,
+            tags: imgSubmit.tags,
+            oldPermalink: imageDetail,
+            fileId: imgSubmit.fileId
+        }
+
+        setUploading(true)
+        e.preventDefault()
+
+        /* console.log(uploadImage); */
+
+        try {
+            const resPost = await fetch('/api/imagekit', {
+                method: 'POST',
+                body: JSON.stringify(imgDelete),
+            })
+
+            const { imageKitStatus } = await resPost.json()
+            console.log(imageKitStatus);
+
             // handle the error
             if (!resPost.ok) {
                 throw new Error(await resPost.text())
@@ -157,19 +255,105 @@ export default function UploadForm() {
             console.error(err)
         }
 
-        setReload(true)
-        setTitle("")
-        setPermalink("")
-        setTags([])
-        setSelectedImage()
+        setImgSubmit(
+            {
+                title: "Select your image",
+                permalink: "dummy-image.jpg",
+                tags: [],
+            }
+        )
         setUploading(false)
     }
 
-    const handleSubmit = () => {
-        console.log(imgSubmit)
+    const handleUpdate = (e) => {
+
+        const { name, value } = e.target
+
+        setImgSubmit((prevValue) => {
+            if (name === "titleUpdate") {
+                return {
+                    title: value,
+                    permalink: prevValue.permalink,
+                    tags: prevValue.tags,
+                    fileId: prevValue.fileId
+                }
+            } else if (name === "permalinkUpdate") {
+                return {
+                    title: prevValue.title,
+                    permalink: value,
+                    tags: prevValue.tags,
+                    fileId: prevValue.fileId
+                }
+
+            }
+        })
     }
 
-    /* console.log(tags); */
+    const updateImg = async (e) => {
+        /* console.log(imgUpdate); */
+
+        setUploading(true)
+        e.preventDefault()
+
+        try {
+            const resPost = await fetch('/api/imagekit', {
+                method: 'POST',
+                body: JSON.stringify(imgUpdate),
+            })
+
+            const { imageKitStatus } = await resPost.json()
+            console.log(imageKitStatus);
+
+            // handle the error
+            if (!resPost.ok) {
+                throw new Error(await resPost.text())
+            }
+            setImgSubmit(
+                {
+                    title: "Select your image",
+                    permalink: "dummy-image.jpg",
+                    tags: [],
+                }
+            )
+            setReload(true)
+        } catch (err) {
+            // Handle errors here
+            console.error(err)
+        }
+        
+        setUploading(false)
+    }
+
+    const newUpdateTag = () => {
+        setImgSubmit((prevValue) => {
+            return {
+                title: prevValue.title,
+                permalink: prevValue.permalink,
+                tags: [...prevValue.tags, updateTag],
+                fileId: prevValue.fileId
+            }
+        })
+
+        setUpdateTag()
+    }
+
+    const selectedImageDetail = (image) => {
+        const { permalink } = image
+        setImageDetail(permalink)
+        setImgSubmit(image)
+    }
+
+    useEffect(() => {
+        setImgUpdate({
+            action: "Update",
+            update: true,
+            title: imgSubmit.title,
+            permalink: imgSubmit.permalink,
+            tags: imgSubmit.tags,
+            oldPermalink: imageDetail,
+            fileId: imgSubmit.fileId
+        })
+    }, [imgSubmit, imageDetail])
 
     return (
         <div className='relative'>
@@ -196,35 +380,42 @@ export default function UploadForm() {
                                 <div className={(libTab) ? 'flex flex-row  p-2 gap-4 w-full' : 'hidden'}>
                                     <div className='flex flex-row p-0 m-0 flex-wrap justify-start content-start overflow-y-auto  basis-8/12 h-[340px]'>
                                         {image.map((image, i) => (
-                                            <button key={i} className='border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring' onClick={() => setImgSubmit(image)}>
-                                                <Image className='h-32 w-32 object-contain' src={iKUrlEndpoint + "/" + image.permalink} alt={image.fileName} width={200} height={100} />
-                                                <p>{image.fileName.slice(0, 12)}</p>
+                                            <button key={i} className='border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring' onClick={() => selectedImageDetail(image)}>
+                                                <Image className='h-32 w-32 object-contain' src={iKUrlEndpoint + "/" + image.permalink} alt={image.permalink} width={200} height={100} />
+                                                <p>{image.title.slice(0, 12)}</p>
                                             </button>
                                         ))}
                                     </div>
                                     <div className='flex flex-col basis-4/12 pr-2 gap-1 overflow-y-auto h-[340px]'>
                                         <h1 className='text-xl'>Detail :</h1>
                                         <div className=' p-1 mb-2 w-auto mx-auto border border-cyan-200'>
-                                            <Image className='h-auto max-h-72 w-full object-contain' src={iKUrlEndpoint + "/" + imgSubmit.permalink} alt={imgSubmit.fileName} width={200} height={100} />
+                                            <Image className='h-auto max-h-72 w-full object-contain' src={iKUrlEndpoint + "/" + imageDetail} alt={imageDetail} width={200} height={100} />
                                         </div>
                                         <p>Title :</p>
-                                        <input placeholder="Select your image" value={imgSubmit.fileName} />
+                                        <input name="titleUpdate" placeholder="Select your image" value={(imgUpdate.update) ? imgUpdate.title : imgSubmit.title} onChange={handleUpdate} />
                                         <p>Permalink :</p>
-                                        <input placeholder="Select your image" value={imgSubmit.permalink} />
+                                        <input name="permalinkUpdate" placeholder="Select your image" value={(imgUpdate.update) ? imgUpdate.permalink : imgSubmit.permalink} onChange={handleUpdate} />
                                         <p>Tag :</p>
+                                        <div className='flex flex-row'>
+                                            <input type="text" placeholder='Your tag' onChange={(e) => { setUpdateTag(e.target.value) }} value={updateTag || ''} />
+                                            <button className='bg-blue-400 px-2' onClick={newUpdateTag}>Add</button>
+                                        </div>
                                         <div className='flex flex-wrap'>
-                                            {imgSubmit.tags.map((tag, i) => {
+                                            {imgUpdate.tags.map((tag, i) => {
                                                 return (
                                                     <div key={i} className='flex flex-row bg-blue-500 m-1 rounded-md'>
                                                         <div className='px-2'>{tag}</div>
-                                                        <div className='flex flex-row rounded-r-md px-2 bg-red-600' onClick={deleteTags} value={tag}>
+                                                        <div className='flex flex-row rounded-r-md px-2 bg-red-600' onClick={deleteUpdateTag} value={updateTag}>
                                                             <Image className="h-4 w-4 m-auto" src='/cross-sign.svg' alt={tag || ""} width={1} height={1} />
                                                         </div>
                                                     </div>
                                                 )
                                             })}
                                         </div>
-
+                                        <div className='flex flex-row content-center justify-center p-2'>
+                                            <button type="button" className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800" onClick={deleteImg}>Delete</button>
+                                            <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={updateImg}>Update</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className={(upTab) ? 'flex flex-row justify-start h-[350px] p-2 w-full gap-4' : 'hidden'}>
@@ -301,7 +492,7 @@ export default function UploadForm() {
                                         <p>Title :</p>
                                         <input placeholder='Your title' onChange={(e) => setTitle(e.target.value)} value={title || ""} />
                                         <p>Permalink :</p>
-                                        <input placeholder={title.replace(/ /g,"-")} onChange={(e) => setPermalink(e.target.value)} value={permalink || ""} />
+                                        <input placeholder={title.replace(/ /g, "-")} onChange={(e) => setPermalink(e.target.value)} value={permalink || ""} />
                                         <p>Tags :</p>
                                         <div className=' flex flex-row'>
                                             <input type="text" placeholder='Your tag' onChange={(e) => { setTag(e.target.value) }} value={tag || ''} />

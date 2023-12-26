@@ -2,6 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import ImageKit from "imagekit";
 import { NextRequest, NextResponse } from 'next/server'
 import ImageKit_Lib from "@/models/ImageKit"
+import { resolve } from "styled-jsx/css";
 
 const imagekit = new ImageKit({
     urlEndpoint: process.env.NEXT_PUBLIC_IK_ENDPOINT1,
@@ -20,7 +21,7 @@ export async function POST(req) {
 
     await dbConnect()
 
-    let seconds="0"+ new Date().getSeconds()
+    let seconds = "0" + new Date().getSeconds()
     let secondsSliced = seconds.slice(-2)
     let minute = "0" + new Date().getMinutes()
     let minuteSliced = minute.slice(-2)
@@ -31,18 +32,78 @@ export async function POST(req) {
     let monthSliced = month.slice(-2)
     let year = "0" + (new Date().getYear())
     let yearSliced = year.slice(-2)
-    let mergeTitle= hourSliced + minuteSliced + secondsSliced + "_" + day + monthSliced + yearSliced
+    let mergeTitle = hourSliced + minuteSliced + secondsSliced + "_" + day + monthSliced + yearSliced
 
-    imagekit.upload({
-        file: data.imageData, //required
-        fileName: data.permalink,   //required
-        useUniqueFileName:false,
-    }, function (error, result) {
-        if (error) console.log(error);
-        /* else console.log(result); */
-    });
-    
-    const imageDbRegist= await ImageKit_Lib.create({ fileName: data.title, uploadDate: mergeTitle, permalink:data.permalink, tags: data.tags })
+    if (data.action === "Upload") {
+        const uploadResult = new Promise((resolve, reject) => {
+            const res = imagekit.upload({
+                file: data.imageData,
+                fileName: data.permalink,
+                useUniqueFileName: false,
+            })
 
-    return NextResponse.json({ success: true, imageKitStatus: data.title })
+            if (res) {
+                resolve(res)
+            } else {
+                reject("Failed")
+            }
+        })
+
+        uploadResult.then((response) => {
+            ImageKit_Lib.create({ title: data.title, uploadDate: mergeTitle, permalink: data.permalink, tags: data.tags, fileId: response.fileId, purgeRequestId: "" })
+            console.log(response);
+        }).catch((message) => {
+            console.log(message);
+        })
+
+        /* const imageDbRegist = await ImageKit_Lib.create({ title: data.title, uploadDate: mergeTitle, permalink: data.permalink, tags: data.tags, fileId: upResult.fileId }) */
+    } else if (data.action === "Update") {
+
+
+        /* await ImageKit_Lib.findOneAndUpdate({ fileId: data.fileId }, { title: data.title, permalink: data.title, tags: data.tags }) */
+
+        if (data.permalink === data.oldPermalink) {
+            await ImageKit_Lib.findOneAndUpdate({ fileId: data.fileId }, { title: data.title, permalink: data.permalink, tags: data.tags })
+        } else if ((data.permalink !== data.oldPermalink)) {
+            const resDB = await ImageKit_Lib.findOneAndUpdate({ fileId: data.fileId }, { title: data.title, permalink: data.permalink, tags: data.tags })
+
+
+            const resIK = imagekit.renameFile({
+                filePath: "/" + data.oldPermalink,
+                newFileName: data.permalink,
+                purgeCache: true // optional
+            })
+
+            /* const updateResult = new Promise((resolve, reject) => {
+                const res = imagekit.renameFile({
+                    filePath: "/" + data.oldPermalink,
+                    newFileName: data.permalink,
+                    purgeCache: true // optional
+                })
+
+                if (res) {
+                    resolve(res)
+                } else {
+                    reject("Failed")
+                }
+            })
+
+            updateResult.then((response) => {
+                ImageKit_Lib.findOneAndUpdate({ fileId: data.fileId }, { title: data.title, permalink: data.permalink, tags: data.tags, purgeRequestId: response.purgeRequestId })
+            }).catch((message) => {
+                console.log(message);
+            }) */
+        }
+
+
+    } else if (data.action === "Delete") {
+        await ImageKit_Lib.deleteOne({ fileId: data.fileId }); // returns {deletedCount: 1}
+
+        imagekit.deleteFile(data.fileId, function (error, result) {
+            if (error) console.log(error);
+            else console.log(result);
+        });
+    }
+
+    return NextResponse.json({ success: true, imageKitStatus: data })
 }
