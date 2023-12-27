@@ -40,6 +40,17 @@ export default function UploadForm() {
     const [permalink, setPermalink] = useState("")
     const [uploadImage, setUploadImage] = useState("")
 
+
+    /* ------------------ Handle open and close Image Component ------------------ */
+    const openPopUp = () => {
+        setPopUp(true)
+    }
+
+    const closePopUp = () => {
+        setPopUp(false)
+    }
+
+    /* ------------------ Handle database image load ------------------ */
     useEffect(() => {
         let loadImg = true
         setReload(false)
@@ -63,14 +74,7 @@ export default function UploadForm() {
         return () => loadImg = false
     }, [reload, /* image */])
 
-    const openPopUp = () => {
-        setPopUp(true)
-    }
-
-    const closePopUp = () => {
-        setPopUp(false)
-    }
-
+    /* ------------------ Handle image tab ------------------ */
     const imageCollection = () => {
         setLibTab(true)
         setUpTab(false)
@@ -81,26 +85,63 @@ export default function UploadForm() {
         setLibTab(false)
     }
 
-    const newTag = () => {
+    /* ------------------ Handle image detail update ------------------ */
 
-        if (tag) {
-            setTags((prevTags) => {
-
-                return ([...prevTags, tag.replace(/ /g, "-")])
-            })
-            setTag()
-        }
-        /* console.log(tags); */
+    const selectedImageDetail = (image) => {
+        const { permalink } = image
+        setImageDetail(permalink)
+        setImgSubmit(image)
     }
 
-    const deleteTags = (e) => {
-        const delTag = e.target.alt
-        setTags(tags.filter(tag => tag !== delTag))
+    useEffect(() => {
+        setUpdateImage({
+            action: "Update",
+            update: true,
+            title: imgSubmit.title,
+            permalink: imgSubmit.permalink,
+            tags: imgSubmit.tags,
+            oldPermalink: imageDetail,
+            fileId: imgSubmit.fileId
+        })
+    }, [imgSubmit, imageDetail])
+
+    const handleUpdate = (e) => {
+        const { name, value } = e.target
+
+        setImgSubmit((prevValue) => {
+            if (name === "titleUpdate") {
+                return {
+                    title: value,
+                    permalink: prevValue.permalink,
+                    tags: prevValue.tags,
+                    fileId: prevValue.fileId
+                }
+            } else if (name === "permalinkUpdate") {
+                return {
+                    title: prevValue.title,
+                    permalink: value,
+                    tags: prevValue.tags,
+                    fileId: prevValue.fileId
+                }
+
+            }
+        })
+    }
+
+    const newUpdateTag = () => {
+        setImgSubmit((prevValue) => {
+            return {
+                title: prevValue.title,
+                permalink: prevValue.permalink,
+                tags: [...prevValue.tags, updateTag.replace(/ /g, "-")],
+                fileId: prevValue.fileId
+            }
+        })
+        setUpdateTag()
     }
 
     const deleteUpdateTag = (e) => {
         const delTag = e.target.alt
-        /* setUpdateTags(updateTag.filter(updateTag => updateTag !== delTag)) */
 
         setImgSubmit((prevValue) => {
             return {
@@ -110,67 +151,40 @@ export default function UploadForm() {
                 fileId: prevValue.fileId
             }
         })
-
     }
 
-    useEffect(() => {
-        if (!permalink) {
-            const permalink = title.replace(/ /g, "-")
-            setUploadImage({
-                title: title,
-                permalink: permalink,
-                tags: tags,
-                imageData: selectedFile,
-                action: "Upload",
-            })
-        } else {
-            setUploadImage({
-                title: title,
-                permalink: permalink,
-                tags: tags,
-                imageData: selectedFile,
-                action: "Upload",
-            })
-        }
-
-    }, [title, permalink, tags, selectedFile])
-
-    const onUpload = async (e) => {
+    const updateImg = async (e) => {
         setUploading(true)
         e.preventDefault()
-        if (!selectedFile) return
 
         try {
             const resPost = await fetch('/api/imagekit', {
                 method: 'POST',
-                body: JSON.stringify(uploadImage),
+                body: JSON.stringify(updateImage),
             })
-
             const { imageKitStatus } = await resPost.json()
             console.log(imageKitStatus);
-
-            setReload(true)
 
             // handle the error
             if (!resPost.ok) {
                 throw new Error(await resPost.text())
             }
+            setImgSubmit(
+                {
+                    title: "Select your image",
+                    permalink: "dummy-image.jpg",
+                    tags: [],
+                }
+            )
+            setReload(true)
         } catch (err) {
             // Handle errors here
             console.error(err)
         }
-
-        setTitle("")
-        setPermalink("")
-        setTags([])
-        setSelectedImage()
         setUploading(false)
     }
 
-    const handleSubmit = () => {
-        console.log(imgSubmit)
-        setPopUp(false)
-    }
+    /* ------------------ Handle image delete ------------------ */
 
     const deleteImg = async (e) => {
         const imgDelete = {
@@ -215,94 +229,83 @@ export default function UploadForm() {
         setUploading(false)
     }
 
-    const handleUpdate = (e) => {
+    /* ------------------ Handle image upload ------------------ */
 
-        const { name, value } = e.target
+    useEffect(() => {
+        if (!permalink) {
+            const permalink = title.replace(/ /g, "-")
+            setUploadImage({
+                title: title,
+                permalink: permalink,
+                tags: tags,
+                imageData: selectedFile,
+                action: "Upload",
+            })
+        } else {
+            setUploadImage({
+                title: title,
+                permalink: permalink,
+                tags: tags,
+                imageData: selectedFile,
+                action: "Upload",
+            })
+        }
 
-        setImgSubmit((prevValue) => {
-            if (name === "titleUpdate") {
-                return {
-                    title: value,
-                    permalink: prevValue.permalink,
-                    tags: prevValue.tags,
-                    fileId: prevValue.fileId
-                }
-            } else if (name === "permalinkUpdate") {
-                return {
-                    title: prevValue.title,
-                    permalink: value,
-                    tags: prevValue.tags,
-                    fileId: prevValue.fileId
-                }
+    }, [title, permalink, tags, selectedFile])
 
-            }
-        })
+    const newTag = () => {
+        if (tag) {
+            setTags((prevTags) => {
+
+                return ([...prevTags, tag.replace(/ /g, "-")])
+            })
+            setTag()
+        }
     }
 
-    const updateImg = async (e) => {
+    const deleteTags = (e) => {
+        const delTag = e.target.alt
+        setTags(tags.filter(tag => tag !== delTag))
+    }
 
+    const onUpload = async (e) => {
         setUploading(true)
         e.preventDefault()
+        if (!selectedFile) return
 
         try {
             const resPost = await fetch('/api/imagekit', {
                 method: 'POST',
-                body: JSON.stringify(updateImage),
+                body: JSON.stringify(uploadImage),
             })
 
             const { imageKitStatus } = await resPost.json()
             console.log(imageKitStatus);
 
+            setReload(true)
+
             // handle the error
             if (!resPost.ok) {
                 throw new Error(await resPost.text())
             }
-            setImgSubmit(
-                {
-                    title: "Select your image",
-                    permalink: "dummy-image.jpg",
-                    tags: [],
-                }
-            )
-            setReload(true)
         } catch (err) {
             // Handle errors here
             console.error(err)
         }
-        
+
+        setTitle("")
+        setPermalink("")
+        setTags([])
+        setSelectedImage()
         setUploading(false)
     }
 
-    const newUpdateTag = () => {
-        setImgSubmit((prevValue) => {
-            return {
-                title: prevValue.title,
-                permalink: prevValue.permalink,
-                tags: [...prevValue.tags, updateTag.replace(/ /g, "-")],
-                fileId: prevValue.fileId
-            }
-        })
+    /* ------------------ Handle image submit to page ------------------ */
 
-        setUpdateTag()
+    const handleSubmit = () => {
+        console.log(imgSubmit)
+        setPopUp(false)
     }
-
-    const selectedImageDetail = (image) => {
-        const { permalink } = image
-        setImageDetail(permalink)
-        setImgSubmit(image)
-    }
-
-    useEffect(() => {
-        setUpdateImage({
-            action: "Update",
-            update: true,
-            title: imgSubmit.title,
-            permalink: imgSubmit.permalink,
-            tags: imgSubmit.tags,
-            oldPermalink: imageDetail,
-            fileId: imgSubmit.fileId
-        })
-    }, [imgSubmit, imageDetail])
 
     return (
         <div className='relative'>
@@ -310,7 +313,7 @@ export default function UploadForm() {
             <div className={(popUp) ? "z-10 flex flex-col fixed bg-red-900 items-center w-screen" : "hidden"}>
                 <div className=' absolute opacity-60 bg-gray-500 w-screen h-screen'>
                 </div>
-                <div className='absolute pt-6 w-[1200px] h-[520px]'>
+                <div className='absolute pt-2 w-96 md:w-[700px] lg:w-[1000px] xl:w-[1200px] xl:h-[520px]'>
                     <div className='flex flex-col dark:bg-darkmode bg-white p-2 mx-auto item-center'>
                         <div className='text-xl py-2 mx-auto'>Media Library</div>
                         <div className='flex flex-col item-center'>
@@ -327,7 +330,7 @@ export default function UploadForm() {
                             </div>
                             <div className='flex flex-row justify-center'>
                                 <div className={(libTab) ? 'flex flex-row  p-2 gap-4 w-full' : 'hidden'}>
-                                    <div className='flex flex-row p-0 m-0 flex-wrap justify-start content-start overflow-y-auto  basis-8/12 h-[340px]'>
+                                    <div className='flex flex-row p-0 m-0 flex-wrap justify-start content-start overflow-y-auto  basis-8/12 xl:h-[340px]'>
                                         {image.map((image, i) => (
                                             <button key={i} className='border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring' onClick={() => selectedImageDetail(image)}>
                                                 <Image className='h-32 w-32 object-contain' src={iKUrlEndpoint + "/" + image.permalink} alt={image.permalink} width={200} height={100} />
@@ -397,7 +400,6 @@ export default function UploadForm() {
                                                         if (file) {
                                                             setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
                                                         }
-                                                        /* console.log(file); */
                                                     }
                                                 }
                                             }
@@ -420,7 +422,6 @@ export default function UploadForm() {
                                                         if (file) {
                                                             setSelectedImage(URL.createObjectURL(new Blob(binaryData, { type: "file" })))
                                                         }
-                                                        /* console.log(file); */
                                                     }
                                                 }}
 

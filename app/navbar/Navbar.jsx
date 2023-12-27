@@ -26,7 +26,7 @@ const Navbar = (props) => {
     setMounted(true);
 
     const changeColor = () => {
-      if (window.scrollY >= 200) {
+      if (window.scrollY >= 100) {
         setColor("rgba(	0, 32, 74, 0.8)");
         setTextColor("#ffffff");
       } else if (props.pages === "composePost") {
@@ -62,7 +62,7 @@ const Navbar = (props) => {
         }}
         className={poppins.className}
       >
-        <div className=" relative flex flex-row items-center top-0 m-0  px-8 py-0.5  text-white">
+        <div className=" relative flex flex-row items-center top-0 m-0  px-8 py-0.5  text-white md:  lg:  xl: ">
           <Link href="/">
             <h1
               style={{ color: `${textColor}` }}
@@ -94,7 +94,7 @@ const Navbar = (props) => {
                   <Popover.Button
                     className={`${
                       open ? "" : "text-opacity-90"
-                    } relative inline-block py-1 px-3 my-3 mx-4 text-white text-base tracking-wide rounded-full overflow-hidden bg-blue-400 hover:bg-blue-300 hover:text-blue-100 active:bg-blue-400 active:text-blue-100 backdrop-opacity-80 focus:outline-none`}
+                    } relative inline-block py-1 px-3 my-3 mx-4 text-white   tracking-wide rounded-full overflow-hidden bg-blue-400 hover:bg-blue-300 hover:text-blue-100 active:bg-blue-400 active:text-blue-100 backdrop-opacity-80 focus:outline-none`}
                   >
                     <BiSearchAlt
                       className="inline-block inset-y-1 pl-0 mr-2"
@@ -183,7 +183,7 @@ const Navbar = (props) => {
                             active
                               ? "bg-gray-100 text-gray-900"
                               : "text-gray-700",
-                            "block px-4 py-2 text-sm"
+                            "block px-4 py-2  "
                           )}
                         >
                           Google Account
@@ -198,7 +198,7 @@ const Navbar = (props) => {
                             active
                               ? "bg-gray-100 text-gray-900"
                               : "text-gray-700",
-                            "block px-4 py-2 text-sm"
+                            "block px-4 py-2  "
                           )}
                         >
                           Github
@@ -216,7 +216,7 @@ const Navbar = (props) => {
           {/* Mobile Menu */}
           <Menu>
             <Menu.Button>
-              <div className="relative sm:hidden inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-3 py-0 px-1 mx-3">
+              <div className="relative md:hidden inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-3 py-0 px-1 mx-3">
                 <div className="relative top-1">
                   <Image
                     src="/blankAvatar.svg"
@@ -247,7 +247,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block px-4 py-2  "
                         )}
                       >
                         Google Account
@@ -262,7 +262,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block px-4 py-2  "
                         )}
                       >
                         Github
@@ -281,7 +281,7 @@ const Navbar = (props) => {
             <div>
               <Menu.Button
                 ref={refOne}
-                className="inline-flex w-full justify-center  rounded-md transparent px-2 mx-1 my-1 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                className="inline-flex w-full justify-center  rounded-md transparent px-2 mx-1 my-1 py-2   font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
               >
                 <AiOutlineMenu
                   className="mr-0 h-5 w-5 text-gray-400 justify-center"
@@ -309,7 +309,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block px-4 py-2  "
                         )}
                       >
                         Gallery
@@ -324,7 +324,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block px-4 py-2  "
                         )}
                       >
                         Work
@@ -339,7 +339,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-200"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block px-4 py-2  "
                         )}
                       >
                         Blog
@@ -354,7 +354,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-200"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block px-4 py-2  "
                         )}
                       >
                         Showcase
@@ -369,10 +369,10 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-200"
                             : "text-gray-700",
-                          "block px-4 py-2 text-sm"
+                          "block px-4 py-2  "
                         )}
                       >
-                        <button className="relative inline-block py-1 px-4 my-2 mx-4 text-white text-base tracking-wide rounded-full overflow-hidden bg-blue-400 hover:bg-blue-300 hover:text-blue-100 active:bg-blue-400 active:text-blue-100 backdrop-opacity-80 focus:outline-none">
+                        <button className="relative inline-block py-1 px-4 my-2 mx-4 text-white   tracking-wide rounded-full overflow-hidden bg-blue-400 hover:bg-blue-300 hover:text-blue-100 active:bg-blue-400 active:text-blue-100 backdrop-opacity-80 focus:outline-none">
                           <p href="#">
                             <BiSearchAlt className="inline-block " size={25} />
                             Search...
