@@ -25,6 +25,12 @@ module.exports = {
       colors:{
         darkmode:"#001531",
         lightmode:"#fafafa",
+        colorone:"#f3d251",
+        colortwo:"#fba449",
+        colorthree:"#4791d2",
+        colorfour:"#0077bc",
+        colorfive:"#e62382",
+        colorsix:"#c6217e",
       },
     },
   },
