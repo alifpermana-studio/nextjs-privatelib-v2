@@ -1,4 +1,5 @@
 "use client";
+
 import { Poppins } from "next/font/google";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, Fragment } from "react";
@@ -22,6 +23,14 @@ function classNames(...classes) {
 
 const Navbar = (props) => {
   const { systemTheme, theme, setTheme } = useTheme();
+  const [currentTheme, setCurrentTheme]=useState("dark")
+
+  /* const currentTheme = theme === "system" ? systemTheme : theme; */
+
+  useEffect(() => {
+    setCurrentTheme(theme === "system" ? systemTheme : theme)
+  }, [systemTheme,theme]);
+
   /*   const navbarBurger=(e)=>{
     console.log(e.target);
   }
@@ -62,10 +71,11 @@ const Navbar = (props) => {
     }
   };
 
-  const currentTheme = theme === "system" ? systemTheme : theme;
+  /* 
+  console.log(theme); */
 
   return (
-    <div className="shrink w-full fixed text-darkmode bg-lightmode  dark:bg-[#002B64]  dark:text-lightmode">
+    <div className="shrink w-full fixed inset-x-0 top-0 text-darkmode bg-lightmode z-50   dark:bg-[#002B64]  dark:text-lightmode">
       <nav className="relative px-4 py-1 flex justify-between items-center mx-auto max-w-[1500px] ">
         <a className="text-3xl font-bold leading-none lg:hidden" href="#">
           <Image
@@ -76,14 +86,19 @@ const Navbar = (props) => {
           />
         </a>
         <div className="hidden text-2xl lg:flex lg:flex-row lg:items-center font-extrabold">
-          <Image src="/a-logo.svg" alt="ap-logo" width={30} height={30} />
+          <div className="h-full">
+            <Image src="/a-logo.svg" alt="ap-logo" width={30} height={30} />
+          </div>
+
           <p className="pr-3">lif</p>
-          <Image src="/p-logo.svg" alt="ap-logo" width={30} height={30} />
+          <div className="h-full">
+            <Image src="/p-logo.svg" alt="ap-logo" width={30} height={30} />
+          </div>
           <p>ustaka</p>
         </div>
         <div className="flex flex-row justify-center items-center lg:hidden">
           <MagnifyingGlassIcon
-            className="mr-2 ml-1 h-8 w-8 text-colortwo hover:text-colorone"
+            className="mr-2 ml-1 h-8 w-8 text-colorfour dark:text-colortwo  hover:text-colorone"
             aria-hidden="true"
           />
           <button
@@ -100,7 +115,7 @@ const Navbar = (props) => {
             </div>
           </button>
         </div>
-        <div className="hidden lg:flex flex-row ml-auto text-base font-semibold">
+        <div className="hidden lg:flex flex-row mx-auto text-base font-semibold">
           <Menu as="div" className="relative text-left">
             <div>
               <Menu.Button className="inline-flex w-full items-center justify-center rounded-md px-4 py-2">
@@ -211,7 +226,7 @@ const Navbar = (props) => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+              <Menu.Items className="relative right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item>
                     {({ active }) => (
@@ -296,8 +311,8 @@ const Navbar = (props) => {
           href="#"
         >
           <MagnifyingGlassIcon
-          className="mr-2 h-6 w-6 text-colortwo hover:text-colorone"
-          aria-hidden="true"
+            className="mr-2 h-6 w-6 text-colortwo hover:text-colorone"
+            aria-hidden="true"
           />
           <p className="mr-3">Search</p>
         </button>
@@ -309,7 +324,7 @@ const Navbar = (props) => {
               alt="Light Mode"
             >
               <div className="relative top-0">
-                <Image src="/moon.svg" alt="logo" height="30" width="30" />
+                <Image src="/moon.svg" alt="logo" height={30} width={30} />
               </div>
             </button>
           ) : (
@@ -319,7 +334,7 @@ const Navbar = (props) => {
               alt="Dark Mode"
             >
               <div className="relative top-0">
-                <Image src="/sun.svg" alt="logo" height="30" width="30" />
+                <Image src="/sun.svg" alt="logo" height={30} width={30} />
               </div>
             </button>
           )}
@@ -438,7 +453,9 @@ const Navbar = (props) => {
           </div>
           <div className="mt-auto">
             <div className="flex flex-row w-full justify-center items-center  gap-3 text-base">
-              <p className="block mt-4 mb-2  text-center  rounded-xl">Switch Theme :</p>
+              <p className="block mt-4 mb-2  text-center  rounded-xl">
+                Switch Theme :
+              </p>
               {currentTheme === "dark" ? (
                 <button
                   className="flex flex-row items-center px-4 py-2 mt-4 mb-2 gap-2 text-center text-lightmode bg-darkmode dark:text-darkmode dark:bg-lightmode rounded-xl"
@@ -446,7 +463,7 @@ const Navbar = (props) => {
                   alt="Light Mode"
                 >
                   <div className="relative top-0">
-                    <Image src="/moon.svg" alt="logo" height="20" width="20" />
+                    <Image src="/moon.svg" alt="logo" height={20} width={20} />
                   </div>
                   <p>Dark</p>
                 </button>
@@ -457,7 +474,7 @@ const Navbar = (props) => {
                   alt="Dark Mode"
                 >
                   <div className="relative top-0">
-                    <Image src="/sun.svg" alt="logo" height="20" width="20" />
+                    <Image src="/sun.svg" alt="logo" height={20} width={20} />
                   </div>
                   <p>Light</p>
                 </button>

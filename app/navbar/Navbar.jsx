@@ -135,7 +135,7 @@ const Navbar = (props) => {
                 alt="Light Mode"
               >
                 <div className="relative top-0">
-                  <Image src="/sun.svg" alt="logo" height="30" width="30" />
+                  <Image src="/moon.svg" alt="logo" height="30" width="30" />
                 </div>
               </button>
             ) : (
@@ -145,7 +145,7 @@ const Navbar = (props) => {
                 alt="Dark Mode"
               >
                 <div className="relative top-0">
-                  <Image src="/moon.svg" alt="logo" height="30" width="30" />
+                  <Image src="/sun.svg" alt="logo" height="30" width="30" />
                 </div>
               </button>
             )}
@@ -391,7 +391,7 @@ const Navbar = (props) => {
                         >
                           <div className="relative top-1">
                             <Image
-                              src="/sun.svg"
+                              src="/moon.svg"
                               alt="logo"
                               height="30"
                               width="30"
@@ -406,7 +406,7 @@ const Navbar = (props) => {
                         >
                           <div className="relative top-1">
                             <Image
-                              src="/moon.svg"
+                              src="/sun.svg"
                               alt="logo"
                               height="30"
                               width="30"
