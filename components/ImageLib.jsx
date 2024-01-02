@@ -4,7 +4,7 @@ import { forwardRef, useState, useEffect } from "react";
 import React from "react";
 import Image from "next/image";
 
-const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1
+const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1;
 
 const ImageLib = forwardRef(function ImageLib(props, ref) {
   const [popUp, setPopUp] = useState(false);
@@ -324,35 +324,32 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
       </div>
       <div className="flex flex-row justify-center">
         <div
-          className={libTab ? "flex flex-row  p-2 gap-4 w-full" : "hidden"}
-        ></div>
-        <div
           className={
-            upTab ? "flex flex-row justify-start p-2 w-full gap-4" : "hidden"
+            libTab
+              ? "relative flex flex-row p-2 gap-4 w-full h-[60svh] sm:h-[40svh] md:h-[45svh] lg:h-[65svh] "
+              : "hidden"
           }
-        ></div>
-      </div>
-      <div className="flex flex-row justify-center">
-        <div className={libTab ? "flex flex-row  p-2 gap-4 w-full" : "hidden"}>
-          <div className="flex flex-row p-0 m-0 flex-wrap justify-start content-start overflow-y-auto  basis-8/12 xl:h-[340px]">
+        >
+          <div className="relative flex flex-wrap overflow-y-auto lg:basis-8/12">
+            {" "}
             {image.map((image, i) => (
               <button
                 key={i}
-                className="border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring"
+                className="flex flex-col content-between items-center truncate border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring text-xs w-16 lg:w-32"
                 onClick={() => selectedImageDetail(image)}
               >
                 <Image
-                  className="h-32 w-32 object-contain"
+                  className="h-16 w-16 lg:h-32 lg:w-32 object-contain"
                   src={iKUrlEndpoint + "/" + image.permalink}
                   alt={image.permalink}
-                  width={200}
-                  height={100}
+                  width={20}
+                  height={10}
                 />
-                <p>{image.title.slice(0, 12)}</p>
+                <p className="truncate">{image.title}</p>
               </button>
             ))}
           </div>
-          <div className="flex flex-col basis-4/12 pr-2 gap-1 overflow-y-auto h-[340px]">
+          <div className="hidden lg:flex flex-col basis-4/12 pr-2 gap-1 overflow-y-auto text-left ">
             <h1 className="text-xl">Detail :</h1>
             <div className=" p-1 mb-2 w-auto mx-auto border border-cyan-200">
               <Image
@@ -439,14 +436,14 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
         <div
           className={
             upTab
-              ? "flex flex-row justify-start h-[350px] p-2 w-full gap-4"
+              ? "relative flex flex-col justify-start p-2 w-full gap-4 h-[60svh] sm:flex-row sm:h-[40svh] md:h-[45svh] lg:h-[65svh] lg:max-w-4xl"
               : "hidden"
           }
         >
           <div className="flex flex-col items-start p-1 basis-3/6">
-            <div className="text-xl pb-2">Select your image</div>
+            <div className="pb-2">Select your image</div>
             <label
-              className="w-full relative h-full mb-1 aspect-video rounded-xl flex items-center justify-center border-[3px] border-gray-400 border-dashed cursor-pointer p-1"
+              className="w-full h-fit relative mb-1 aspect-video rounded-xl flex items-center justify-center border-[3px] border-gray-400 border-dashed cursor-pointer p-1"
               onDragOver={(e) => {
                 e.preventDefault();
               }}
@@ -518,7 +515,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
               </div>
             </label>
           </div>
-          <div className="flex flex-col pt-10 item-start text-lg gap-1 basis-3/6 overflow-y-auto">
+          <div className="flex flex-col item-start text-left text-lg sm:text-sm gap-1 basis-3/6 overflow-y-auto">
             <p>Title :</p>
             <input
               placeholder="Your title"

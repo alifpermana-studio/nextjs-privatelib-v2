@@ -2,7 +2,7 @@
 
 import Navbar from "../navbarv2/Navbar"
 import styles from "./page.module.css"
-import ImageLib from "@/component/ImageLib"
+import ImageLib from "@/components/ImageLib"
 import React, { useEffect } from "react"
 import { useState, useRef } from "react"
 
@@ -31,10 +31,10 @@ export default function UploadForm() {
 
   return (
     <div className="relative">
-      <div className={(popUp) ? "shrink w-full fixed z-30 " : "hidden"}>
-        <div className=' absolute opacity-60 bg-gray-500 w-screen h-screen -my-6'>
+      <div className={(popUp) ? "flex items-center justify-center shrink w-full fixed z-30 " : "hidden"}>
+        <div className=' absolute opacity-60 bg-gray-500 w-screen h-[150svh] -my-6'>
         </div>
-        <div className=' relative flex flex-col gap-4 text-center bg-lightmode dark:bg-darkmode text-lg p-2 mx-4 my-4'>
+        <div className=' relative flex flex-col gap-2 text-center w-full h-full bg-lightmode dark:bg-darkmode text-lg p-2 mx-4 my-2 max-w-[1500px]'>
           <ImageLib ref={inputRef}/>
           <div className='flex flex-  row content-center justify-center p-2'>
             <button type="button" className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800" onClick={closeImageLib}>Cancel</button>
