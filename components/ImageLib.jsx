@@ -28,6 +28,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
     action: "Update",
     update: false,
     tags: [],
+    permalink:"",
   });
   const [libTab, setLibTab] = useState(true);
   const [upTab, setUpTab] = useState(false);
@@ -116,7 +117,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
       } else if (name === "permalinkUpdate") {
         return {
           title: prevValue.title,
-          permalink: value,
+          permalink: updateImage.permalink.slice(0,13)+value,
           tags: prevValue.tags,
           fileId: prevValue.fileId,
         };
@@ -300,7 +301,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
   return (
     <div ref={ref}>
       <div>Media Library</div>
-      <div className="pl-4 text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+      <div className=" text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
         <ul className="flex flex-row gap-6 justify-center text-base">
           <li>
             <button
@@ -330,22 +331,22 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
               : "hidden"
           }
         >
-          <div className="relative flex flex-wrap overflow-y-auto lg:basis-8/12">
+          <div className="relative flex flex-row flex-wrap content-start overflow-y-auto lg:basis-8/12">
             {" "}
             {image.map((image, i) => (
               <button
                 key={i}
-                className="flex flex-col content-between items-center truncate border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring text-xs w-16 lg:w-32"
+                className="flex flex-col items-center truncate border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring text-xs w-16 h-18 lg:w-32"
                 onClick={() => selectedImageDetail(image)}
               >
                 <Image
                   className="h-16 w-16 lg:h-32 lg:w-32 object-contain"
                   src={iKUrlEndpoint + "/" + image.permalink}
-                  alt={image.permalink}
+                  alt={image.permalink.slice(13)}
                   width={20}
                   height={10}
                 />
-                <p className="truncate">{image.title}</p>
+                <p className="text-ellipsis">{image.title}</p>
               </button>
             ))}
           </div>
@@ -355,7 +356,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
               <Image
                 className="h-auto max-h-72 w-full object-contain"
                 src={iKUrlEndpoint + "/" + imageDetail}
-                alt={imageDetail}
+                alt={(imageDetail==="dummy-image.jpg")? "Select your image":imageDetail}
                 width={200}
                 height={100}
               />
@@ -372,7 +373,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
               name="permalinkUpdate"
               placeholder="Select your image"
               value={
-                updateImage.update ? updateImage.permalink : imgSubmit.permalink
+                (updateImage.permalink==="dummy-image.jpg")? "Select your image":updateImage.permalink.slice(13)
               }
               onChange={handleUpdate}
             />

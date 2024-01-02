@@ -27,18 +27,20 @@ export async function POST(req) {
     let minuteSliced = minute.slice(-2)
     let hour = "0" + new Date().getHours()
     let hourSliced = hour.slice(-2)
-    let day = new Date().getDate()
+    /* let day = new Date().getDate() */
+    let day = "0" + (new Date().getDate())
+    let daySliced = day.slice(-2)
     let month = "0" + (new Date().getMonth() + 1)
     let monthSliced = month.slice(-2)
     let year = "0" + (new Date().getYear())
     let yearSliced = year.slice(-2)
-    let mergeTitle = hourSliced + minuteSliced + secondsSliced + "_" + day + monthSliced + yearSliced
+    let mergeTitle = hourSliced + minuteSliced + secondsSliced + daySliced + monthSliced + yearSliced
 
     if (data.action === "Upload") {
         const uploadResult = new Promise((resolve, reject) => {
             const res = imagekit.upload({
                 file: data.imageData,
-                fileName: data.permalink,
+                fileName: mergeTitle + "-" + data.permalink,
                 useUniqueFileName: false,
             })
 
@@ -50,17 +52,13 @@ export async function POST(req) {
         })
 
         uploadResult.then((response) => {
-            ImageKit_Lib.create({ title: data.title, uploadDate: mergeTitle, permalink: data.permalink, tags: data.tags, fileId: response.fileId, purgeRequestId: "" })
+            ImageKit_Lib.create({ title: data.title, uploadDate: mergeTitle, permalink: mergeTitle + "-" + data.permalink, tags: data.tags, fileId: response.fileId, purgeRequestId: "" })
             console.log(response);
         }).catch((message) => {
             console.log(message);
         })
 
-        /* const imageDbRegist = await ImageKit_Lib.create({ title: data.title, uploadDate: mergeTitle, permalink: data.permalink, tags: data.tags, fileId: upResult.fileId }) */
     } else if (data.action === "Update") {
-
-
-        /* await ImageKit_Lib.findOneAndUpdate({ fileId: data.fileId }, { title: data.title, permalink: data.title, tags: data.tags }) */
 
         if (data.permalink === data.oldPermalink) {
             await ImageKit_Lib.findOneAndUpdate({ fileId: data.fileId }, { title: data.title, permalink: data.permalink, tags: data.tags })
@@ -73,26 +71,6 @@ export async function POST(req) {
                 newFileName: data.permalink,
                 purgeCache: true // optional
             })
-
-            /* const updateResult = new Promise((resolve, reject) => {
-                const res = imagekit.renameFile({
-                    filePath: "/" + data.oldPermalink,
-                    newFileName: data.permalink,
-                    purgeCache: true // optional
-                })
-
-                if (res) {
-                    resolve(res)
-                } else {
-                    reject("Failed")
-                }
-            })
-
-            updateResult.then((response) => {
-                ImageKit_Lib.findOneAndUpdate({ fileId: data.fileId }, { title: data.title, permalink: data.permalink, tags: data.tags, purgeRequestId: response.purgeRequestId })
-            }).catch((message) => {
-                console.log(message);
-            }) */
         }
 
 
