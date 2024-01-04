@@ -14,6 +14,9 @@ import {
   ChevronUpIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
+import { signIn, useSession } from "next-auth/react";
+import { data } from "autoprefixer";
+import { setLazyProp } from "next/dist/server/api-utils";
 
 const poppins = Poppins({ weight: ["400", "700"], subsets: ["latin"] });
 
@@ -23,28 +26,30 @@ function classNames(...classes) {
 
 const Navbar = (props) => {
   const { systemTheme, theme, setTheme } = useTheme();
-  const [currentTheme, setCurrentTheme]=useState("dark")
-
-  /* const currentTheme = theme === "system" ? systemTheme : theme; */
+  const [currentTheme, setCurrentTheme] = useState("dark");
+  const { data: session, status, update, loading } = useSession();
+  const [login, setLogin] = useState(false);
 
   useEffect(() => {
-    setCurrentTheme(theme === "system" ? systemTheme : theme)
-  }, [systemTheme,theme]);
+    setCurrentTheme(theme === "system" ? systemTheme : theme);
+  }, [systemTheme, theme]);
 
-  /*   const navbarBurger=(e)=>{
-    console.log(e.target);
-  }
-  const navbarClose=(e)=>{
-    console.log(e);
-  }
-  const navbarBackdrop=(e)=>{
-    console.log(e);
-  }
-  const navbarMenu=(e)=>{
-    console.log(e);
-  } */
+  useEffect(() => {
+    if (session) {
+      const loginName = session.user.name;
+      if (loginName > 10) {
+        setLogin("Hello, " + session.user.name.slice(0, 10) + "...");
+      } else {
+        setLogin("Hello, " + loginName);
+      }
+    } else if (loading) {
+      setLogin("Loading...");
+    } else if (!session) {
+      setLogin("Sign In");
+    }
+  }, [session, loading]);
 
-  // Burger menus
+  console.log(session.user.name);
 
   // open
   const navbarBurger = () => {
@@ -70,9 +75,6 @@ const Navbar = (props) => {
       menu[0].classList.toggle("hidden");
     }
   };
-
-  /* 
-  console.log(theme); */
 
   return (
     <div className="shrink w-full fixed inset-x-0 top-0 text-darkmode bg-lightmode z-50   dark:bg-[#002B64]  dark:text-lightmode">
@@ -118,14 +120,14 @@ const Navbar = (props) => {
         <div className="hidden lg:flex flex-row mx-auto text-base font-semibold">
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md px-4 py-2">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2">
                 <p className="hover:text-colorone">Home</p>
               </Menu.Button>
             </div>
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
                 <p className="hover:text-colorone">Portofolio</p>
                 <ChevronDownIcon
                   className="-mr-1 ml-1 h-5 w-5 hover:text-colorone"
@@ -209,7 +211,7 @@ const Navbar = (props) => {
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
                 <p className="hover:text-colorone">Collection</p>
                 <ChevronDownIcon
                   className="-mr-1 ml-2 h-5 w-5 hover:text-colorone"
@@ -293,14 +295,14 @@ const Navbar = (props) => {
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
                 <p className="hover:text-colorone">Blog</p>
               </Menu.Button>
             </div>
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
                 <p className="hover:text-colorone">Contact</p>
               </Menu.Button>
             </div>
@@ -340,10 +342,10 @@ const Navbar = (props) => {
           )}
         </div>
         <a
-          className="hidden lg:inline-block py-2 px-6 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200"
-          href="#"
+          className="hidden lg:inline-block py-2 px-2 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200"
+          href="/api/auth/signin"
         >
-          Sign up
+          {login}
         </a>
       </nav>
       <div className="navbar-menu relative z-50 hidden">
@@ -379,7 +381,7 @@ const Navbar = (props) => {
             </button>
           </div>
           <div>
-            <Disclosure>
+            <Disclosure  isclosure>
               {({ open }) => (
                 <>
                   <Disclosure.Button className="flex w-full justify-between p-2  text-base font-semibold hover:bg-blue-50 hover:text-blue-600 rounded">
@@ -485,11 +487,11 @@ const Navbar = (props) => {
                 className="block px-4 py-3 mb-2  text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl"
                 href="#"
               >
-                Sign Up
+                {login}
               </a>
             </div>
             <p className="my-4 text-xs text-center text-gray-400">
-              <span>Copyright © 2023</span>
+              <span>Copyright © 2024</span>
             </p>
           </div>
         </nav>
