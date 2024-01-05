@@ -14,7 +14,7 @@ import {
   ChevronUpIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { data } from "autoprefixer";
 import { setLazyProp } from "next/dist/server/api-utils";
 
@@ -35,7 +35,7 @@ const Navbar = (props) => {
   }, [systemTheme, theme]);
 
   useEffect(() => {
-    if (session) {
+    if (status === "authenticated") {
       const loginName = session.user.name;
       if (loginName > 10) {
         setLogin("Hello, " + session.user.name.slice(0, 10) + "...");
@@ -44,12 +44,22 @@ const Navbar = (props) => {
       }
     } else if (loading) {
       setLogin("Loading...");
-    } else if (!session) {
-      setLogin("Sign In");
+    } else if (status === "unauthenticated") {
+      setLogin(false);
     }
-  }, [session, loading]);
+  }, [session, status, loading]);
 
-  console.log(session.user.name);
+  const signInGoogle = async () => {
+    try {
+      await signIn("google", { callbackUrl: "/clientimgv3" });
+      const resSignIn=await fetch("/api/user",{
+        method: "GET",
+      });
+      console.log(resSignIn);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   // open
   const navbarBurger = () => {
@@ -88,10 +98,9 @@ const Navbar = (props) => {
           />
         </a>
         <div className="hidden text-2xl lg:flex lg:flex-row lg:items-center font-extrabold">
-          <div className="h-full">
+          <div className="h-full mb-2">
             <Image src="/a-logo.svg" alt="ap-logo" width={30} height={30} />
           </div>
-
           <p className="pr-3">lif</p>
           <div className="h-full">
             <Image src="/p-logo.svg" alt="ap-logo" width={30} height={30} />
@@ -341,12 +350,133 @@ const Navbar = (props) => {
             </button>
           )}
         </div>
-        <a
-          className="hidden lg:inline-block py-2 px-2 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200"
-          href="/api/auth/signin"
-        >
-          {login}
-        </a>
+        <div className="hidden lg:flex relative text-left">
+          {login ? (
+            <Menu as="div" className="hidden lg:flex relative text-left">
+              <div>
+                <Menu.Button className="hidden lg:inline-block py-2 px-2 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200">
+                  {login}
+                </Menu.Button>
+              </div>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 mt-12 w-40 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                  <div className="px-1 py-1 ">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active
+                              ? "bg-violet-500 text-white"
+                              : "text-gray-900"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Profile
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active
+                              ? "bg-violet-500 text-white"
+                              : "text-gray-900"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Dashboard
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active
+                              ? "bg-violet-500 text-white"
+                              : "text-gray-900"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Setting
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          onClick={() => signOut("google")}
+                          className={`${
+                            active
+                              ? "bg-violet-500 text-white"
+                              : "text-gray-900"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Sign out
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          ) : (
+            <Menu as="div" className="hidden lg:flex relative text-left">
+              <div>
+                <Menu.Button className="hidden lg:inline-block py-2 px-2 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200">
+                  Sign In
+                </Menu.Button>
+              </div>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 mt-12 w-40 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                  <div className="px-1 py-1 ">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          onClick={signInGoogle}
+                          className={`${
+                            active
+                              ? "bg-violet-500 text-white"
+                              : "text-gray-900"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Google Account
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active
+                              ? "bg-violet-500 text-white"
+                              : "text-gray-900"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Github
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          )}
+        </div>
       </nav>
       <div className="navbar-menu relative z-50 hidden">
         <div
@@ -381,7 +511,7 @@ const Navbar = (props) => {
             </button>
           </div>
           <div>
-            <Disclosure  isclosure>
+            <Disclosure isclosure>
               {({ open }) => (
                 <>
                   <Disclosure.Button className="flex w-full justify-between p-2  text-base font-semibold hover:bg-blue-50 hover:text-blue-600 rounded">

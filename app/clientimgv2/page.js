@@ -8,26 +8,29 @@ import { useSession } from 'next-auth/react'
 
 export default function UploadForm() {
     const { data: session, status, update, loading } = useSession()
+    const [userStatus, setUserStatus]=useState({
+        status:false,
+        name:"",
+    })
 
-    if (status === "authenticated") {
-        return (
-            <div className={styles.tesKhusus}>
-                <Navbar />
-                <div className='mt-20'>
-                    <p>Signed in as {session.user.email}</p>
-                </div>
-            </div>
-        )
-    }
+    console.log(session);
 
-    console.log(status);
+    useEffect(()=>{
+        if (status === "authenticated") {
+            setUserStatus({
+                status:true,
+                name:session.user.name,
+            })
+        }
+        console.log(session);
+    },[status, session])    
 
     return (
-        <div className={styles.tesKhusus}>
+        <div className="relative">
             <Navbar />
-            <div className='mt-20'>
-                <p>You are not logged in.</p>
-                <a href="/api/auth/signin">Sign in</a>
+            <div className='relative mt-16'>
+                <p className={(status)?"flex":"hidden"}>Hello, {userStatus.name}</p>
+                <p className={(status)?"hidden":"flex"}>You are not logged in.</p>
             </div>
         </div>
     )

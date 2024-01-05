@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import Navbar from '../navbar/Navbar'
+import Navbar from '../navbarv2/Navbar'
 
 const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1
 
