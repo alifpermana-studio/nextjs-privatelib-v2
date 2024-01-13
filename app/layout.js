@@ -3,7 +3,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { NextAuthProvider } from './nextauthprovider'
 import { getServerSession } from 'next-auth'
-import { authOptions } from './api/auth/[...nextauth]/route'
+import { options } from './api/auth/[...nextauth]/options'
 
 const poppins = Poppins({ weight: ['400', '700'], subsets: ['latin'] })
 
@@ -14,7 +14,7 @@ const poppins = Poppins({ weight: ['400', '700'], subsets: ['latin'] })
 
 
 export default async function RootLayout({ children }) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(options)
 
   return (
     <html lang="en">

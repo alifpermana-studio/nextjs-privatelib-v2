@@ -1,15 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode:'class',
+  darkMode: "class",
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     color: {
-      dark:{
-        blue:"#001531",
+      dark: {
+        blue: "#001531",
       },
       primary: "rgb(var(--color-primary) / <alpha-value>)",
       text: "rgb(var(--color-text) / <alpha-value>)",
@@ -21,18 +21,18 @@ module.exports = {
       transparent: "transparent",
       current: "currentColor",
     },
-    extend:{
-      colors:{
-        darkmode:"#001531",
-        lightmode:"#fafafa",
-        colorone:"#f3d251",
-        colortwo:"#fba449",
-        colorthree:"#4791d2",
-        colorfour:"#0077bc",
-        colorfive:"#e62382",
-        colorsix:"#c6217e",
+    extend: {
+      colors: {
+        darkmode: "#001531",
+        lightmode: "#fafafa",
+        colorone: "#EA0008",
+        colortwo: "#FF383e",
+        colorthree: "#0008EA",
+        colorfour: "#383eff",
+        colorfive: "#07d100",
+        colorsix: "#3eff38",
       },
     },
   },
   plugins: [],
-}
+};

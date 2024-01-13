@@ -8,21 +8,17 @@ import { Menu, Popover, Transition, Disclosure } from "@headlessui/react";
 import { BiSearchAlt } from "react-icons/bi";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { useTheme } from "next-themes";
-import styles from "./page.module.css";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { data } from "autoprefixer";
-import { setLazyProp } from "next/dist/server/api-utils";
+import { redirect, useRouter } from "next/navigation";
 
-const poppins = Poppins({ weight: ["400", "700"], subsets: ["latin"] });
-
-function classNames(...classes) {
+/* function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
-}
+} */
 
 const Navbar = (props) => {
   const { systemTheme, theme, setTheme } = useTheme();
@@ -34,11 +30,11 @@ const Navbar = (props) => {
     setCurrentTheme(theme === "system" ? systemTheme : theme);
   }, [systemTheme, theme]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (status === "authenticated") {
       const loginName = session.user.name;
-      if (loginName > 10) {
-        setLogin("Hello, " + session.user.name.slice(0, 10) + "...");
+      if (loginName.length > 10) {
+        setLogin("Hello, " + session.user.name.split(" ")[0]);
       } else {
         setLogin("Hello, " + loginName);
       }
@@ -47,26 +43,26 @@ const Navbar = (props) => {
     } else if (status === "unauthenticated") {
       setLogin(false);
     }
-  }, [session, status, loading]);
+  }, [session, status, loading]); */
 
   const signInGoogle = async () => {
     try {
-      await signIn("google", { callbackUrl: "/clientimgv3" });
-      const resSignIn=await fetch("/api/user",{
-        method: "GET",
-      });
-      console.log(resSignIn);
+      await signIn("google", { callbackUrl: "/profile" });
     } catch (err) {
       console.log(err);
     }
   };
 
+  const handleSignOut = () => {
+    push("/api/auth/signout?callbackUrl=/");
+  };
+
+  const { push } = useRouter();
+
   // open
   const navbarBurger = () => {
     const burger = document.querySelectorAll(".navbar-burger");
     const menu = document.querySelectorAll(".navbar-menu");
-
-    console.log(menu);
 
     if (burger.length && menu.length) {
       menu[0].classList.toggle("hidden");
@@ -79,16 +75,14 @@ const Navbar = (props) => {
     const close = document.querySelectorAll(".navbar-close");
     const backdrop = document.querySelectorAll(".navbar-backdrop");
 
-    console.log(menu);
-
     if (close.length && backdrop.length) {
       menu[0].classList.toggle("hidden");
     }
   };
 
   return (
-    <div className="shrink w-full fixed inset-x-0 top-0 text-darkmode bg-lightmode z-50   dark:bg-[#002B64]  dark:text-lightmode">
-      <nav className="relative px-4 py-1 flex justify-between items-center mx-auto max-w-[1500px] ">
+    <div className="fixed inset-x-0 top-0 z-50 w-full shrink bg-lightmode text-darkmode   dark:bg-[#002B64]  dark:text-lightmode">
+      <nav className="relative mx-auto flex max-w-[1500px] items-center justify-between px-4 py-1 ">
         <a className="text-3xl font-bold leading-none lg:hidden" href="#">
           <Image
             src="/alif-pustaka-logo.svg"
@@ -97,8 +91,8 @@ const Navbar = (props) => {
             height={50}
           />
         </a>
-        <div className="hidden text-2xl lg:flex lg:flex-row lg:items-center font-extrabold">
-          <div className="h-full mb-2">
+        <div className="hidden text-2xl font-extrabold lg:flex lg:flex-row lg:items-center">
+          <div className="mb-2 h-full">
             <Image src="/a-logo.svg" alt="ap-logo" width={30} height={30} />
           </div>
           <p className="pr-3">lif</p>
@@ -107,13 +101,13 @@ const Navbar = (props) => {
           </div>
           <p>ustaka</p>
         </div>
-        <div className="flex flex-row justify-center items-center lg:hidden">
+        <div className="flex flex-row items-center justify-center lg:hidden">
           <MagnifyingGlassIcon
-            className="mr-2 ml-1 h-8 w-8 text-colorfour dark:text-colortwo  hover:text-colorone"
+            className="ml-1 mr-2 h-8 w-8 text-colorfour hover:text-colorone  dark:text-colortwo"
             aria-hidden="true"
           />
           <button
-            className="navbar-burger flex items-center text-blue-600 p-3"
+            className="navbar-burger flex items-center p-3 text-blue-600"
             onClick={navbarBurger}
           >
             <div className="">
@@ -126,17 +120,17 @@ const Navbar = (props) => {
             </div>
           </button>
         </div>
-        <div className="hidden lg:flex flex-row mx-auto text-base font-semibold">
+        <div className="mx-auto hidden flex-row text-base font-semibold lg:flex">
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md py-2 lg:px-2 xl:px-4">
                 <p className="hover:text-colorone">Home</p>
               </Menu.Button>
             </div>
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md py-2 lg:px-2 xl:px-4 ">
                 <p className="hover:text-colorone">Portofolio</p>
                 <ChevronDownIcon
                   className="-mr-1 ml-1 h-5 w-5 hover:text-colorone"
@@ -220,7 +214,7 @@ const Navbar = (props) => {
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md py-2 lg:px-2 xl:px-4 ">
                 <p className="hover:text-colorone">Collection</p>
                 <ChevronDownIcon
                   className="-mr-1 ml-2 h-5 w-5 hover:text-colorone"
@@ -304,21 +298,21 @@ const Navbar = (props) => {
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md py-2 lg:px-2 xl:px-4 ">
                 <p className="hover:text-colorone">Blog</p>
               </Menu.Button>
             </div>
           </Menu>
           <Menu as="div" className="relative text-left">
             <div>
-              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md lg:px-2 xl:px-4 py-2 ">
+              <Menu.Button className="inline-flex w-full items-center justify-center rounded-md py-2 lg:px-2 xl:px-4 ">
                 <p className="hover:text-colorone">Contact</p>
               </Menu.Button>
             </div>
           </Menu>
         </div>
         <button
-          className="hidden lg:flex lg:flex-row ml-auto items-center gap-1 py-1 px-2 bg-gray-50 hover:bg-gray-200 text-base text-gray-900 font-bold  rounded-3xl transition duration-200"
+          className="ml-auto hidden items-center gap-1 rounded-3xl bg-gray-50 px-2 py-1 text-base font-bold text-gray-900 transition duration-200  hover:bg-gray-200 lg:flex lg:flex-row"
           href="#"
         >
           <MagnifyingGlassIcon
@@ -330,7 +324,7 @@ const Navbar = (props) => {
         <div className="hidden lg:flex">
           {currentTheme === "dark" ? (
             <button
-              className="relative inline-block justify-center bg-black-700 hover:bg-black rounded-full border-purple-400 border-2 w-8 h-8 my-3 py-0 px-1 mx-3"
+              className="bg-black-700 relative mx-3 my-3 inline-block h-8 w-8 justify-center rounded-full border-2 border-purple-400 px-1 py-0 hover:bg-black"
               onClick={() => setTheme("light")}
               alt="Light Mode"
             >
@@ -340,7 +334,7 @@ const Navbar = (props) => {
             </button>
           ) : (
             <button
-              className="relative inline-block justify-center bg-black-700 hover:bg-white rounded-full border-purple-400 border-2 w-8 h-8 my-3 py-0 px-1 mx-3"
+              className="bg-black-700 relative mx-3 my-3 inline-block h-8 w-8 justify-center rounded-full border-2 border-purple-400 px-1 py-0 hover:bg-white"
               onClick={() => setTheme("dark")}
               alt="Dark Mode"
             >
@@ -350,11 +344,11 @@ const Navbar = (props) => {
             </button>
           )}
         </div>
-        <div className="hidden lg:flex relative text-left">
+        <div className="relative hidden text-left lg:flex">
           {login ? (
-            <Menu as="div" className="hidden lg:flex relative text-left">
+            <Menu as="div" className="relative hidden text-left lg:flex">
               <div>
-                <Menu.Button className="hidden lg:inline-block py-2 px-2 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200">
+                <Menu.Button className="hidden rounded-xl bg-blue-500 px-2 py-2 text-sm font-bold text-white transition duration-200 hover:bg-blue-600 lg:inline-block">
                   {login}
                 </Menu.Button>
               </div>
@@ -411,7 +405,7 @@ const Navbar = (props) => {
                     <Menu.Item>
                       {({ active }) => (
                         <button
-                          onClick={() => signOut("google")}
+                          onClick={handleSignOut}
                           className={`${
                             active
                               ? "bg-violet-500 text-white"
@@ -427,53 +421,15 @@ const Navbar = (props) => {
               </Transition>
             </Menu>
           ) : (
-            <Menu as="div" className="hidden lg:flex relative text-left">
+            <Menu as="div" className="relative hidden text-left lg:flex">
               <div>
-                <Menu.Button className="hidden lg:inline-block py-2 px-2 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200">
+                <Menu.Button
+                  onClick={() => push("/enter")}
+                  className="hidden rounded-xl bg-blue-500 px-2 py-2 text-sm font-bold text-white transition duration-200 hover:bg-blue-600 lg:inline-block"
+                >
                   Sign In
                 </Menu.Button>
               </div>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute right-0 mt-12 w-40 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-                  <div className="px-1 py-1 ">
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          onClick={signInGoogle}
-                          className={`${
-                            active
-                              ? "bg-violet-500 text-white"
-                              : "text-gray-900"
-                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                        >
-                          Google Account
-                        </button>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          className={`${
-                            active
-                              ? "bg-violet-500 text-white"
-                              : "text-gray-900"
-                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                        >
-                          Github
-                        </button>
-                      )}
-                    </Menu.Item>
-                  </div>
-                </Menu.Items>
-              </Transition>
             </Menu>
           )}
         </div>
@@ -483,8 +439,8 @@ const Navbar = (props) => {
           className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"
           onClick={navbarClose}
         ></div>
-        <nav className="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-lightmode dark:bg-darkmode border-r overflow-y-auto">
-          <div className="flex items-center mb-8">
+        <nav className="fixed bottom-0 left-0 top-0 flex w-5/6 max-w-sm flex-col overflow-y-auto border-r bg-lightmode px-6 py-6 dark:bg-darkmode">
+          <div className="mb-8 flex items-center">
             <a className="mr-auto text-3xl font-bold leading-none" href="#">
               <Image
                 src="/alif-pustaka-logo.svg"
@@ -495,7 +451,7 @@ const Navbar = (props) => {
             </a>
             <button className="navbar-close" onClick={navbarClose}>
               <svg
-                className="h-6 w-6 text-gray-400 cursor-pointer hover:text-gray-500"
+                className="h-6 w-6 cursor-pointer text-gray-400 hover:text-gray-500"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -514,7 +470,7 @@ const Navbar = (props) => {
             <Disclosure isclosure>
               {({ open }) => (
                 <>
-                  <Disclosure.Button className="flex w-full justify-between p-2  text-base font-semibold hover:bg-blue-50 hover:text-blue-600 rounded">
+                  <Disclosure.Button className="flex w-full justify-between rounded  p-2 text-base font-semibold hover:bg-blue-50 hover:text-blue-600">
                     <span>Home</span>
                   </Disclosure.Button>
                 </>
@@ -523,7 +479,7 @@ const Navbar = (props) => {
             <Disclosure>
               {({ open }) => (
                 <>
-                  <Disclosure.Button className="flex w-full justify-between p-2  text-base font-semibold hover:bg-blue-50 hover:text-blue-600 rounded">
+                  <Disclosure.Button className="flex w-full justify-between rounded  p-2 text-base font-semibold hover:bg-blue-50 hover:text-blue-600">
                     <span>Portofolio</span>
                     <ChevronUpIcon
                       className={`${
@@ -532,10 +488,10 @@ const Navbar = (props) => {
                     />
                   </Disclosure.Button>
                   <Disclosure.Panel className="flex flex-col pl-2 text-base font-semibold text-gray-500">
-                    <a className="p-2 hover:bg-blue-50 hover:text-blue-600 rounded">
+                    <a className="rounded p-2 hover:bg-blue-50 hover:text-blue-600">
                       React
                     </a>
-                    <a className="p-2 hover:bg-blue-50 hover:text-blue-600 rounded">
+                    <a className="rounded p-2 hover:bg-blue-50 hover:text-blue-600">
                       Vue
                     </a>
                   </Disclosure.Panel>
@@ -545,7 +501,7 @@ const Navbar = (props) => {
             <Disclosure>
               {({ open }) => (
                 <>
-                  <Disclosure.Button className="flex w-full justify-between p-2  text-base font-semibold hover:bg-blue-50 hover:text-blue-600 rounded">
+                  <Disclosure.Button className="flex w-full justify-between rounded  p-2 text-base font-semibold hover:bg-blue-50 hover:text-blue-600">
                     <span>Collection</span>
                     <ChevronUpIcon
                       className={`${
@@ -554,10 +510,10 @@ const Navbar = (props) => {
                     />
                   </Disclosure.Button>
                   <Disclosure.Panel className="flex flex-col pl-2 text-base font-semibold text-gray-500">
-                    <a className="p-2 hover:bg-blue-50 hover:text-blue-600 rounded">
+                    <a className="rounded p-2 hover:bg-blue-50 hover:text-blue-600">
                       React
                     </a>
-                    <a className="p-2 hover:bg-blue-50 hover:text-blue-600 rounded">
+                    <a className="rounded p-2 hover:bg-blue-50 hover:text-blue-600">
                       Vue
                     </a>
                   </Disclosure.Panel>
@@ -567,7 +523,7 @@ const Navbar = (props) => {
             <Disclosure>
               {({ open }) => (
                 <>
-                  <Disclosure.Button className="flex w-full justify-between p-2  text-base font-semibold hover:bg-blue-50 hover:text-blue-600 rounded">
+                  <Disclosure.Button className="flex w-full justify-between rounded  p-2 text-base font-semibold hover:bg-blue-50 hover:text-blue-600">
                     <span>Blog</span>
                   </Disclosure.Button>
                 </>
@@ -576,7 +532,7 @@ const Navbar = (props) => {
             <Disclosure>
               {({ open }) => (
                 <>
-                  <Disclosure.Button className="flex w-full justify-between p-2  text-base font-semibold hover:bg-blue-50 hover:text-blue-600 rounded">
+                  <Disclosure.Button className="flex w-full justify-between rounded  p-2 text-base font-semibold hover:bg-blue-50 hover:text-blue-600">
                     <span>Contact</span>
                   </Disclosure.Button>
                 </>
@@ -584,13 +540,13 @@ const Navbar = (props) => {
             </Disclosure>
           </div>
           <div className="mt-auto">
-            <div className="flex flex-row w-full justify-center items-center  gap-3 text-base">
-              <p className="block mt-4 mb-2  text-center  rounded-xl">
+            <div className="flex w-full flex-row items-center justify-center  gap-3 text-base">
+              <p className="mb-2 mt-4 block  rounded-xl  text-center">
                 Switch Theme :
               </p>
               {currentTheme === "dark" ? (
                 <button
-                  className="flex flex-row items-center px-4 py-2 mt-4 mb-2 gap-2 text-center text-lightmode bg-darkmode dark:text-darkmode dark:bg-lightmode rounded-xl"
+                  className="mb-2 mt-4 flex flex-row items-center gap-2 rounded-xl bg-darkmode px-4 py-2 text-center text-lightmode dark:bg-lightmode dark:text-darkmode"
                   onClick={() => setTheme("light")}
                   alt="Light Mode"
                 >
@@ -601,7 +557,7 @@ const Navbar = (props) => {
                 </button>
               ) : (
                 <button
-                  className="flex flex-row items-center px-4 py-2 mt-4 mb-2 gap-2 text-center text-lightmode bg-darkmode dark:text-darkmode dark:bg-lightmode  rounded-xl"
+                  className="mb-2 mt-4 flex flex-row items-center gap-2 rounded-xl bg-darkmode px-4 py-2 text-center text-lightmode dark:bg-lightmode  dark:text-darkmode"
                   onClick={() => setTheme("dark")}
                   alt="Dark Mode"
                 >
@@ -614,13 +570,13 @@ const Navbar = (props) => {
             </div>
             <div className="pt-2">
               <a
-                className="block px-4 py-3 mb-2  text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl"
+                className="mb-2 block rounded-xl bg-blue-600  px-4 py-3 text-center text-xs font-semibold text-white  hover:bg-blue-700"
                 href="#"
               >
                 {login}
               </a>
             </div>
-            <p className="my-4 text-xs text-center text-gray-400">
+            <p className="my-4 text-center text-xs text-gray-400">
               <span>Copyright © 2024</span>
             </p>
           </div>
