@@ -177,7 +177,7 @@ function ColorGuide() {
                   "  mx-auto  text-center text-2xl font-normal text-black hover:font-bold "
                 }
               >
-                Poppins
+                Papaa
               </a>
             </div>
             <div className="mx-auto flex w-full max-w-sm rounded-md bg-lightmode p-4 shadow-lg shadow-gray-400 dark:shadow-none">

@@ -4,7 +4,8 @@ datasource db {
 }
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
+  previewFeatures = ["mongodb"]
 }
 
 model Account {
@@ -46,6 +47,24 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+}
+
+model Imagekit {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  uploadDate     String
+  folder         String
+  title          String
+  permalink      String
+  tags           String[]
+  fileId         String    @unique
+  userId         String
+  purgeRequestId String?
+}
+
+model Post {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  content        String
 }
 
 

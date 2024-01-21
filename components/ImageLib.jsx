@@ -3,6 +3,7 @@
 import { forwardRef, useState, useEffect } from "react";
 import React from "react";
 import Image from "next/image";
+import { logging } from "@/next.config";
 
 const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1;
 
@@ -28,7 +29,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
     action: "Update",
     update: false,
     tags: [],
-    permalink:"",
+    permalink: "",
   });
   const [libTab, setLibTab] = useState(true);
   const [upTab, setUpTab] = useState(false);
@@ -86,8 +87,8 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
   /* ------------------ Handle image detail update ------------------ */
 
   const selectedImageDetail = (image) => {
-    const { permalink } = image;
-    setImageDetail(permalink);
+    const { permalink, folder, uploadDate } = image;
+    setImageDetail(folder + "/" + uploadDate + "-" + permalink);
     setImgSubmit(image);
   };
 
@@ -117,7 +118,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
       } else if (name === "permalinkUpdate") {
         return {
           title: prevValue.title,
-          permalink: updateImage.permalink.slice(0,13)+value,
+          permalink: updateImage.permalink.slice(0, 13) + value,
           tags: prevValue.tags,
           fileId: prevValue.fileId,
         };
@@ -298,16 +299,20 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
     setPopUp(false);
   };
 
+  /* console.log(
+    image[0].folder + "/" + image[0].uploadDate + "-" + image[0].permalink,
+  ); */
+
   return (
     <div ref={ref}>
       <div>Media Library</div>
-      <div className=" text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
-        <ul className="flex flex-row gap-6 justify-center text-base">
+      <div className=" border-b border-gray-200 text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        <ul className="flex flex-row justify-center gap-6 text-base">
           <li>
             <button
               onClick={imageCollection}
               aria-pressed={libTab ? "true" : "false"}
-              className="flex basis-1/2 pb-1 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:text-gray-300 aria-pressed:font-extrabold aria-pressed:border-gray-300"
+              className="flex basis-1/2 rounded-t-lg border-b-2 border-transparent pb-1 hover:border-gray-300 hover:text-gray-600 aria-pressed:border-gray-300 aria-pressed:font-extrabold dark:text-gray-300"
             >
               Image Collection
             </button>
@@ -316,7 +321,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
             <button
               onClick={imageUpload}
               aria-pressed={upTab ? "true" : "false"}
-              className="flex basis-1/2 pb-1 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:text-gray-300 aria-pressed:font-extrabold aria-pressed:border-gray-300"
+              className="flex basis-1/2 rounded-t-lg border-b-2 border-transparent pb-1 hover:border-gray-300 hover:text-gray-600 aria-pressed:border-gray-300 aria-pressed:font-extrabold dark:text-gray-300"
             >
               Image Upload
             </button>
@@ -327,7 +332,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
         <div
           className={
             libTab
-              ? "relative flex flex-row p-2 gap-4 w-full h-[60svh] sm:h-[40svh] md:h-[45svh] lg:h-[65svh] "
+              ? "relative flex h-[60svh] w-full flex-row gap-4 p-2 sm:h-[40svh] md:h-[45svh] lg:h-[65svh] "
               : "hidden"
           }
         >
@@ -336,27 +341,39 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
             {image.map((image, i) => (
               <button
                 key={i}
-                className="flex flex-col items-center truncate border border-cyan-500 m-1 focus:bg-slate-50 focus:text-cyan-950 focus:ring text-xs w-16 h-18 lg:w-32"
+                className="h-18 m-1 flex w-16 flex-col items-center truncate border border-cyan-500 text-xs focus:bg-slate-50 focus:text-cyan-950 focus:ring lg:w-32"
                 onClick={() => selectedImageDetail(image)}
               >
                 <Image
-                  className="h-16 w-16 lg:h-32 lg:w-32 object-contain"
-                  src={iKUrlEndpoint + "/" + image.permalink}
+                  className="h-16 w-16 object-contain lg:h-32 lg:w-32"
+                  src={
+                    iKUrlEndpoint +
+                    "/" +
+                    image.folder +
+                    "/" +
+                    image.uploadDate +
+                    "-" +
+                    image.permalink
+                  }
                   alt={image.permalink.slice(13)}
                   width={20}
                   height={10}
                 />
-                <p className="text-ellipsis">{image.title}</p>
+                <p className="text-ellipsis">{image.fileId}</p>
               </button>
             ))}
           </div>
-          <div className="hidden lg:flex flex-col basis-4/12 pr-2 gap-1 overflow-y-auto text-left ">
+          <div className="hidden basis-4/12 flex-col gap-1 overflow-y-auto pr-2 text-left lg:flex ">
             <h1 className="text-xl">Detail :</h1>
-            <div className=" p-1 mb-2 w-auto mx-auto border border-cyan-200">
+            <div className=" mx-auto mb-2 w-auto border border-cyan-200 p-1">
               <Image
                 className="h-auto max-h-72 w-full object-contain"
                 src={iKUrlEndpoint + "/" + imageDetail}
-                alt={(imageDetail==="dummy-image.jpg")? "Select your image":imageDetail}
+                alt={
+                  imageDetail === "dummy-image.jpg"
+                    ? "Select your image"
+                    : imageDetail
+                }
                 width={200}
                 height={100}
               />
@@ -373,7 +390,9 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
               name="permalinkUpdate"
               placeholder="Select your image"
               value={
-                (updateImage.permalink==="dummy-image.jpg")? "Select your image":updateImage.permalink.slice(13)
+                updateImage.permalink === "dummy-image.jpg"
+                  ? "Select your image"
+                  : updateImage.permalink.slice(13)
               }
               onChange={handleUpdate}
             />
@@ -396,16 +415,16 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
                 return (
                   <div
                     key={i}
-                    className="flex flex-row bg-blue-500 m-1 rounded-md"
+                    className="m-1 flex flex-row rounded-md bg-blue-500"
                   >
                     <div className="px-2">{tag}</div>
                     <div
-                      className="flex flex-row rounded-r-md px-2 bg-red-600"
+                      className="flex flex-row rounded-r-md bg-red-600 px-2"
                       onClick={deleteUpdateTag}
                       value={updateTag}
                     >
                       <Image
-                        className="h-4 w-4 m-auto"
+                        className="m-auto h-4 w-4"
                         src="/cross-sign.svg"
                         alt={tag || ""}
                         width={1}
@@ -419,14 +438,14 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
             <div className="flex flex-row content-center justify-center p-2">
               <button
                 type="button"
-                className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800"
+                className="mb-2 me-2 rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
                 onClick={deleteImg}
               >
                 Delete
               </button>
               <button
                 type="button"
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 onClick={updateImg}
               >
                 Update
@@ -437,14 +456,14 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
         <div
           className={
             upTab
-              ? "relative flex flex-col justify-start p-2 w-full gap-4 h-[60svh] sm:flex-row sm:h-[40svh] md:h-[45svh] lg:h-[65svh] lg:max-w-4xl"
+              ? "relative flex h-[60svh] w-full flex-col justify-start gap-4 p-2 sm:h-[40svh] sm:flex-row md:h-[45svh] lg:h-[65svh] lg:max-w-4xl"
               : "hidden"
           }
         >
-          <div className="flex flex-col items-start p-1 basis-3/6">
+          <div className="flex basis-3/6 flex-col items-start p-1">
             <div className="pb-2">Select your image</div>
             <label
-              className="w-full h-fit relative mb-1 aspect-video rounded-xl flex items-center justify-center border-[3px] border-gray-400 border-dashed cursor-pointer p-1"
+              className="relative mb-1 flex aspect-video h-fit w-full cursor-pointer items-center justify-center rounded-xl border-[3px] border-dashed border-gray-400 p-1"
               onDragOver={(e) => {
                 e.preventDefault();
               }}
@@ -464,8 +483,8 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
                   if (file) {
                     setSelectedImage(
                       URL.createObjectURL(
-                        new Blob(binaryData, { type: "file" })
-                      )
+                        new Blob(binaryData, { type: "file" }),
+                      ),
                     );
                   }
                 }
@@ -489,8 +508,8 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
                     if (file) {
                       setSelectedImage(
                         URL.createObjectURL(
-                          new Blob(binaryData, { type: "file" })
-                        )
+                          new Blob(binaryData, { type: "file" }),
+                        ),
                       );
                     }
                   }
@@ -516,7 +535,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
               </div>
             </label>
           </div>
-          <div className="flex flex-col item-start text-left text-lg sm:text-sm gap-1 basis-3/6 overflow-y-auto">
+          <div className="item-start flex basis-3/6 flex-col gap-1 overflow-y-auto text-left text-lg sm:text-sm">
             <p>Title :</p>
             <input
               placeholder="Your title"
@@ -548,16 +567,16 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
                 return (
                   <div
                     key={i}
-                    className="flex flex-row bg-blue-500 m-1 rounded-md"
+                    className="m-1 flex flex-row rounded-md bg-blue-500"
                   >
                     <div className="px-2">{tag}</div>
                     <div
-                      className="flex flex-row rounded-r-md px-2 bg-red-600"
+                      className="flex flex-row rounded-r-md bg-red-600 px-2"
                       onClick={deleteTags}
                       value={tag}
                     >
                       <Image
-                        className="h-4 w-4 m-auto"
+                        className="m-auto h-4 w-4"
                         src="/cross-sign.svg"
                         alt={tag || ""}
                         width={1}
@@ -573,7 +592,7 @@ const ImageLib = forwardRef(function ImageLib(props, ref) {
               onClick={onUpload}
               disabled={uploading}
               style={{ opacity: uploading ? ".5" : "1" }}
-              className=" bg-red-600 p-3 w-32 text-center rounded text-white"
+              className=" w-32 rounded bg-red-600 p-3 text-center text-white"
             >
               {uploading ? "Uploading.." : "Upload"}
             </button>

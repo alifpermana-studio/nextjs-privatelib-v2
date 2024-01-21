@@ -7,6 +7,7 @@ import User from "@/models/User";
 import bcrypt from "bcrypt";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import { PrismaClient as PrismaAuth } from "@/prisma/generated/prismaauth";
 
 /* const refreshTokenApiCall = async (token) => {
   const url = process.env.NEXT_PUBLIC_API_URL + "/auth/refresh";
@@ -36,7 +37,7 @@ const globalForPrisma = global;
 
 export const prisma =
   globalForPrisma.prisma ||
-  new PrismaClient({
+  new PrismaAuth({
     log: ["query"],
   });
 
@@ -111,25 +112,12 @@ export const options = {
 
         const passwordMatch = await bcrypt.compare(
           credentials.password,
-          foundUser.hashedPassword
+          foundUser.hashedPassword,
         );
 
         if (!passwordMatch) {
           return null;
         }
-
-        /* const foundUser = await User.findOne({ email: credentials.email })
-          .lean()
-          .exec(); */
-
-        /* if (foundUser) {
-          const user = {
-            email: foundUser.email,
-            password: foundUser.password,
-            role: foundUser.role,
-            accountStatus: foundUser.accountStatus,
-            myCredentials: credentials,
-          }; */
 
         console.log(foundUser);
 
@@ -142,22 +130,35 @@ export const options = {
     // Set it as jwt instead of database
     strategy: "jwt",
   },
-  /* callbacks: {
-    async jwt({ token, user, credentials }) {
+  callbacks: {
+    async jwt({ token, user, session }) {
       if (user) {
-        token.email = user.email;
-        token.role = user.role;
-        token.credentials = user.credentials;
+        return {
+          ...token,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          userName: user.userName,
+        };
       }
       return token;
     },
 
     async session({ session, token, user }) {
-      if (session.user) {
-        session.user.role = token.role;
-      }
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          image: token.image,
+          userName: token.userName,
+        },
+      };
       return session;
     },
-  }, */
+  },
   /* debug: process.env.NODE_ENV === "development", */
 };

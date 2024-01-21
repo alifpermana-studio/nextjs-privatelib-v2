@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import Navbar from "@/components/Navbar2";
+/* import Navbar from "@/components/Navbar2"; */
 
 const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1;
 
@@ -23,7 +23,11 @@ export default function UploadForm() {
     permalink: "dummy-image.jpg",
     tags: [],
   });
-  const [imageDetail, setImageDetail] = useState("dummy-image.jpg");
+  const [imageDetail, setImageDetail] = useState({
+    folder: "assets",
+    permalink: "dummy-image.svg",
+    uploadDate: "220304200124",
+  });
   const [updateImage, setUpdateImage] = useState({
     action: "Update",
     update: false,
@@ -85,22 +89,41 @@ export default function UploadForm() {
   /* ------------------ Handle image detail update ------------------ */
 
   const selectedImageDetail = (image) => {
-    const { permalink } = image;
-    setImageDetail(permalink);
-    setImgSubmit(image);
+    const { permalink, folder, uploadDate } = image;
+    setImageDetail({
+      folder: folder,
+      permalink: permalink,
+      uploadDate: uploadDate,
+    });
+    setImgSubmit({
+      fileId: image.fileId,
+      folder: image.folder,
+      id: image.id,
+      permalink: image.permalink,
+      purgeRequestId: image.purgeRequestId,
+      tags: image.tags,
+      title: image.title,
+      uploadDate: image.uploadDate,
+      userId: image.userId,
+      oldPermalink: image.permalink,
+    });
   };
 
   useEffect(() => {
-    setUpdateImage({
+    /* setUpdateImage({
       action: "Update",
       update: true,
       title: imgSubmit.title,
       permalink: imgSubmit.permalink,
       tags: imgSubmit.tags,
-      oldPermalink: imageDetail,
+      oldPermalink: imageDetail.permalink,
       fileId: imgSubmit.fileId,
-    });
-  }, [imgSubmit, imageDetail]);
+      uploadDate: imgSubmit.uploadDate,
+      folder: imgSubmit.folder,
+    }); */
+
+    console.log(imgSubmit);
+  }, [imgSubmit, updateTag, imageDetail]);
 
   const handleUpdate = (e) => {
     const { name, value } = e.target;
@@ -108,17 +131,13 @@ export default function UploadForm() {
     setImgSubmit((prevValue) => {
       if (name === "titleUpdate") {
         return {
+          ...prevValue,
           title: value,
-          permalink: prevValue.permalink,
-          tags: prevValue.tags,
-          fileId: prevValue.fileId,
         };
       } else if (name === "permalinkUpdate") {
         return {
-          title: prevValue.title,
+          ...prevValue,
           permalink: value,
-          tags: prevValue.tags,
-          fileId: prevValue.fileId,
         };
       }
     });
@@ -127,10 +146,8 @@ export default function UploadForm() {
   const newUpdateTag = () => {
     setImgSubmit((prevValue) => {
       return {
-        title: prevValue.title,
-        permalink: prevValue.permalink,
+        ...prevValue,
         tags: [...prevValue.tags, updateTag.replace(/ /g, "-")],
-        fileId: prevValue.fileId,
       };
     });
     setUpdateTag();
@@ -141,10 +158,8 @@ export default function UploadForm() {
 
     setImgSubmit((prevValue) => {
       return {
-        title: prevValue.title,
-        permalink: prevValue.permalink,
+        ...prevValue,
         tags: prevValue.tags.filter((updateTag) => updateTag !== delTag),
-        fileId: prevValue.fileId,
       };
     });
   };
@@ -152,11 +167,13 @@ export default function UploadForm() {
   const updateImg = async (e) => {
     setUploading(true);
     e.preventDefault();
+    const imgUpdate = imgSubmit;
+    imgUpdate.action = "Update";
 
     try {
       const resPost = await fetch("/api/imagekit", {
         method: "POST",
-        body: JSON.stringify(updateImage),
+        body: JSON.stringify(imgSubmit),
       });
       const { imageKitStatus } = await resPost.json();
       console.log(imageKitStatus);
@@ -187,7 +204,7 @@ export default function UploadForm() {
       title: imgSubmit.title,
       permalink: imgSubmit.permalink,
       tags: imgSubmit.tags,
-      oldPermalink: imageDetail,
+      oldPermalink: imageDetail.permalink,
       fileId: imgSubmit.fileId,
     };
 
@@ -299,7 +316,6 @@ export default function UploadForm() {
 
   return (
     <div className="relative">
-      <Navbar />
       <div
         className={
           popUp
@@ -349,7 +365,15 @@ export default function UploadForm() {
                       >
                         <Image
                           className="h-32 w-32 object-contain"
-                          src={iKUrlEndpoint + "/" + image.permalink}
+                          src={
+                            iKUrlEndpoint +
+                            "/" +
+                            image.folder +
+                            "/" +
+                            image.uploadDate +
+                            "-" +
+                            image.permalink
+                          }
                           alt={image.permalink}
                           width={200}
                           height={100}
@@ -363,7 +387,15 @@ export default function UploadForm() {
                     <div className=" mx-auto mb-2 w-auto border border-cyan-200 p-1">
                       <Image
                         className="h-auto max-h-72 w-full object-contain"
-                        src={iKUrlEndpoint + "/" + imageDetail}
+                        src={
+                          iKUrlEndpoint +
+                          "/" +
+                          imageDetail.folder +
+                          "/" +
+                          imageDetail.uploadDate +
+                          "-" +
+                          imageDetail.permalink
+                        }
                         alt={imageDetail}
                         width={200}
                         height={100}
@@ -394,6 +426,7 @@ export default function UploadForm() {
                       <input
                         type="text"
                         placeholder="Your tag"
+                        name="updateTag"
                         onChange={(e) => {
                           setUpdateTag(e.target.value);
                         }}
@@ -407,7 +440,7 @@ export default function UploadForm() {
                       </button>
                     </div>
                     <div className="flex flex-wrap">
-                      {updateImage.tags.map((tag, i) => {
+                      {imgSubmit.tags.map((tag, i) => {
                         return (
                           <div
                             key={i}

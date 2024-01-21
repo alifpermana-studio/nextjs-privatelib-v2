@@ -23,7 +23,7 @@ export default function Profile() {
     if (status === "authenticated") {
       setUserStatus({
         status: true,
-        name: session.user.name,
+        name: session.user.id,
       });
     }
 
@@ -33,12 +33,32 @@ export default function Profile() {
   return (
     <div className="relative">
       <Navbar />
-      <div className="relative mt-16">
-        {status ? (
-          <p className="flex">Hello, {userStatus.name}</p>
-        ) : (
-          <p className="flex">You are not logged in.</p>
-        )}
+      <div className="relative mx-auto flex w-full max-w-[1500px] flex-col">
+        <div className="relative mt-14 flex h-[30svh] w-full flex-col items-center justify-center gap-6 md:mt-0 md:h-[110svh]">
+          <div className="absolute h-[30svh] w-full md:h-[110svh]">
+            <Image
+              src="https://ik.imagekit.io/alifpermanastudio/assets/profile-landing-page.png"
+              fill="true"
+            />
+          </div>
+          <div className="relative h-32 w-32 md:h-[200px] md:w-[200px]">
+            <Image
+              src={session.user.image}
+              fill="true"
+              className="rounded-full border-4 border-white shadow-lg shadow-neutral-500 md:border-8"
+            />
+          </div>
+          <div className="relative">
+            <h1 className="text-center text-xl font-bold md:text-4xl">
+              Welcome back, {session.user.name}
+            </h1>
+          </div>
+        </div>
+        <div className="relative -mt-4 flex h-[100svh] w-full flex-col items-center justify-start rounded-2xl bg-darkmode p-4 dark:bg-lightmode md:flex-row">
+          <div className="w-full rounded-2xl bg-lightmode p-2 dark:bg-darkmode">
+            Your Favourite
+          </div>
+        </div>
       </div>
     </div>
   );

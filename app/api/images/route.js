@@ -1,11 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
-import dbConnect from "@/lib/dbConnect";
-import ImageKit_Lib from "@/models/ImageKit"
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { options } from "../auth/[...nextauth]/options";
+
+export const prisma = new PrismaClient();
 
 export async function GET(req) {
+  const session = await getServerSession(options);
 
-  await dbConnect()
-
-  const imageList = await ImageKit_Lib.find({})
-  return NextResponse.json({ success: true, result: imageList})
-} 
+  const imageList = await prisma.Imagekit.findMany({
+    where: {
+      userId: session.user.id,
+    },
+  });
+  return NextResponse.json({ success: true, result: imageList });
+}

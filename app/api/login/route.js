@@ -1,7 +1,8 @@
 import User from "@/models/User";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
+/* import { PrismaClient } from "@prisma/client"; */
+import { PrismaClient } from "@/prisma/generated/prismauser";
 
 const globalForPrisma = global;
 
@@ -36,7 +37,7 @@ export async function POST(req) {
     if (foundUser) {
       const match = await bcrypt.compare(
         userData.password,
-        foundUser.hashedPassword
+        foundUser.hashedPassword,
       );
 
       if (match) {

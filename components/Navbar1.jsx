@@ -8,7 +8,7 @@ import { BiSearchAlt } from "react-icons/bi";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { useTheme } from "next-themes";
 
-const poppins = Poppins({  weight: ['400', '700'], subsets: ['latin'] })
+const poppins = Poppins({ weight: ["400", "700", "800"], subsets: ["latin"] });
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -49,25 +49,22 @@ const Navbar = (props) => {
     <div
       style={{ backgroundColor: `${color}` }}
       className={
-        " shrink w-full fixed inset-x-0 top-0 h-auto m-0 z-50 ease-in duration-300"
+        " fixed inset-x-0 top-0 z-50 m-0 h-auto w-full shrink duration-300 ease-in"
       }
     >
       <div
         style={{
-          fontSize:"18px",
+          fontSize: "18px",
           backdropFilter: "blur(10px)",
-          maxWidth:"1280px",
-          marginLeft:"auto",
-          marginRight:"auto"
+          maxWidth: "1280px",
+          marginLeft: "auto",
+          marginRight: "auto",
         }}
         className={poppins.className}
       >
-        <div className=" relative flex flex-row items-center top-0 m-0  px-8 py-0.5  text-white md:  lg:  xl: ">
+        <div className=" md: lg: xl: relative top-0 m-0  flex flex-row  items-center px-8  py-0.5  text-white ">
           <Link href="/">
-            <h1
-              style={{ color: `${textColor}` }}
-              className="font-bold"
-            >
+            <h1 style={{ color: `${textColor}` }} className="font-bold">
               Alif Pustaka{" "}
             </h1>
           </Link>
@@ -94,13 +91,13 @@ const Navbar = (props) => {
                   <Popover.Button
                     className={`${
                       open ? "" : "text-opacity-90"
-                    } relative inline-block py-1 px-3 my-3 mx-4 text-white   tracking-wide rounded-full overflow-hidden bg-blue-400 hover:bg-blue-300 hover:text-blue-100 active:bg-blue-400 active:text-blue-100 backdrop-opacity-80 focus:outline-none`}
+                    } relative mx-4 my-3 inline-block overflow-hidden rounded-full bg-blue-400   px-3 py-1 tracking-wide text-white backdrop-opacity-80 hover:bg-blue-300 hover:text-blue-100 focus:outline-none active:bg-blue-400 active:text-blue-100`}
                   >
                     <BiSearchAlt
-                      className="inline-block inset-y-1 pl-0 mr-2"
+                      className="inset-y-1 mr-2 inline-block pl-0"
                       size={25}
                     />
-                    <p className="relative inline-block inset-y-0.5" href="#">
+                    <p className="relative inset-y-0.5 inline-block" href="#">
                       Search...
                     </p>
                   </Popover.Button>
@@ -113,12 +110,12 @@ const Navbar = (props) => {
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 translate-y-1"
                   >
-                    <Popover.Panel className="absolute inset-x-0 top-16 px-6 -translate-x-2  w-screen max-w-7xl">
+                    <Popover.Panel className="absolute inset-x-0 top-16 w-screen max-w-7xl  -translate-x-2 px-6">
                       <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                        <div className="relative grid gap-8 bg-white text-blue-700 p-4">
+                        <div className="relative grid gap-8 bg-white p-4 text-blue-700">
                           dfsfdz
                         </div>
-                        <div className="relative grid gap-8 bg-white text-blue-700 p-4">
+                        <div className="relative grid gap-8 bg-white p-4 text-blue-700">
                           dfsfdz
                         </div>
                       </div>
@@ -130,7 +127,7 @@ const Navbar = (props) => {
 
             {currentTheme === "dark" ? (
               <button
-                className="relative inline-block justify-center bg-black-700 hover:bg-black rounded-full border-purple-400 border-2 w-8 h-8 my-3 py-0 px-1 mx-3"
+                className="bg-black-700 relative mx-3 my-3 inline-block h-8 w-8 justify-center rounded-full border-2 border-purple-400 px-1 py-0 hover:bg-black"
                 onClick={() => setTheme("light")}
                 alt="Light Mode"
               >
@@ -140,7 +137,7 @@ const Navbar = (props) => {
               </button>
             ) : (
               <button
-                className="relative inline-block justify-center bg-black-700 hover:bg-white rounded-full border-purple-400 border-2 w-8 h-8 my-3 py-0 px-1 mx-3"
+                className="bg-black-700 relative mx-3 my-3 inline-block h-8 w-8 justify-center rounded-full border-2 border-purple-400 px-1 py-0 hover:bg-white"
                 onClick={() => setTheme("dark")}
                 alt="Dark Mode"
               >
@@ -152,8 +149,8 @@ const Navbar = (props) => {
 
             <Menu>
               <Menu.Button>
-                <div className="relative inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-3 py-0 px-1 mx-3">
-                  <div className="relative my-1 w-5 h-5">
+                <div className="relative mx-3 my-3 inline-block h-8 w-8 justify-center rounded-full border-2 border-purple-400 bg-gray-400 px-1 py-0 hover:bg-gray-300">
+                  <div className="relative my-1 h-5 w-5">
                     <Image
                       src="/blankAvatar.svg"
                       alt="logo"
@@ -172,9 +169,9 @@ const Navbar = (props) => {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute top-14 right-9 z-10 mt-1  w-36 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute right-9 top-14 z-10 mt-1  w-36 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <div>
-                    <div className="absolute -top-1.5 left-28 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white w-0 h-0"></div>
+                    <div className="absolute -top-1.5 left-28 h-0 w-0 border-b-8 border-l-8 border-r-8 border-b-white border-l-transparent border-r-transparent"></div>
                     <Menu.Item>
                       {({ active }) => (
                         <a
@@ -183,7 +180,7 @@ const Navbar = (props) => {
                             active
                               ? "bg-gray-100 text-gray-900"
                               : "text-gray-700",
-                            "block px-4 py-2  "
+                            "block px-4 py-2  ",
                           )}
                         >
                           Google Account
@@ -198,7 +195,7 @@ const Navbar = (props) => {
                             active
                               ? "bg-gray-100 text-gray-900"
                               : "text-gray-700",
-                            "block px-4 py-2  "
+                            "block px-4 py-2  ",
                           )}
                         >
                           Github
@@ -216,7 +213,7 @@ const Navbar = (props) => {
           {/* Mobile Menu */}
           <Menu>
             <Menu.Button>
-              <div className="relative md:hidden inline-block justify-center bg-gray-400 rounded-full border-purple-400 border-2 w-8 h-8 hover:bg-gray-300 my-3 py-0 px-1 mx-3">
+              <div className="relative mx-3 my-3 inline-block h-8 w-8 justify-center rounded-full border-2 border-purple-400 bg-gray-400 px-1 py-0 hover:bg-gray-300 md:hidden">
                 <div className="relative top-1">
                   <Image
                     src="/blankAvatar.svg"
@@ -236,9 +233,9 @@ const Navbar = (props) => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute top-12 right-20 z-10 mt-1  w-36 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute right-20 top-12 z-10 mt-1  w-36 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div>
-                  <div className="absolute -top-1.5 left-28 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white w-0 h-0"></div>
+                  <div className="absolute -top-1.5 left-28 h-0 w-0 border-b-8 border-l-8 border-r-8 border-b-white border-l-transparent border-r-transparent"></div>
                   <Menu.Item>
                     {({ active }) => (
                       <a
@@ -247,7 +244,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2  "
+                          "block px-4 py-2  ",
                         )}
                       >
                         Google Account
@@ -262,7 +259,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2  "
+                          "block px-4 py-2  ",
                         )}
                       >
                         Github
@@ -276,15 +273,15 @@ const Navbar = (props) => {
 
           <Menu
             as="div"
-            className="sm:hidden relative inline-block text-center justify-center item-center "
+            className="item-center relative inline-block justify-center text-center sm:hidden "
           >
             <div>
               <Menu.Button
                 ref={refOne}
-                className="inline-flex w-full justify-center  rounded-md transparent px-2 mx-1 my-1 py-2   font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                className="transparent mx-1 my-1  inline-flex w-full justify-center rounded-md px-2 py-2   font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
               >
                 <AiOutlineMenu
-                  className="mr-0 h-5 w-5 text-gray-400 justify-center"
+                  className="mr-0 h-5 w-5 justify-center text-gray-400"
                   aria-hidden="true"
                 />
               </Menu.Button>
@@ -299,7 +296,7 @@ const Navbar = (props) => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="text-center absolute -right-8 z-10 mt-2 w-screen rounded-md opacity-95 bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute -right-8 z-10 mt-2 w-screen rounded-md bg-white text-center opacity-95 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
@@ -309,7 +306,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2  "
+                          "block px-4 py-2  ",
                         )}
                       >
                         Gallery
@@ -324,7 +321,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-900"
                             : "text-gray-700",
-                          "block px-4 py-2  "
+                          "block px-4 py-2  ",
                         )}
                       >
                         Work
@@ -339,7 +336,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-200"
                             : "text-gray-700",
-                          "block px-4 py-2  "
+                          "block px-4 py-2  ",
                         )}
                       >
                         Blog
@@ -354,7 +351,7 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-200"
                             : "text-gray-700",
-                          "block px-4 py-2  "
+                          "block px-4 py-2  ",
                         )}
                       >
                         Showcase
@@ -369,10 +366,10 @@ const Navbar = (props) => {
                           active
                             ? "bg-gray-100 text-gray-200"
                             : "text-gray-700",
-                          "block px-4 py-2  "
+                          "block px-4 py-2  ",
                         )}
                       >
-                        <button className="relative inline-block py-1 px-4 my-2 mx-4 text-white   tracking-wide rounded-full overflow-hidden bg-blue-400 hover:bg-blue-300 hover:text-blue-100 active:bg-blue-400 active:text-blue-100 backdrop-opacity-80 focus:outline-none">
+                        <button className="relative mx-4 my-2 inline-block overflow-hidden rounded-full bg-blue-400   px-4 py-1 tracking-wide text-white backdrop-opacity-80 hover:bg-blue-300 hover:text-blue-100 focus:outline-none active:bg-blue-400 active:text-blue-100">
                           <p href="#">
                             <BiSearchAlt className="inline-block " size={25} />
                             Search...
@@ -385,7 +382,7 @@ const Navbar = (props) => {
                     {({ active }) =>
                       currentTheme === "dark" ? (
                         <button
-                          className="relative inline-block item-center bg-black-700 hover:bg-black rounded-full border-purple-400 border-2 w-auto h-auto my-2 py-0 px-1"
+                          className="item-center bg-black-700 relative my-2 inline-block h-auto w-auto rounded-full border-2 border-purple-400 px-1 py-0 hover:bg-black"
                           onClick={() => setTheme("light")}
                           alt="Light Mode"
                         >
@@ -400,7 +397,7 @@ const Navbar = (props) => {
                         </button>
                       ) : (
                         <button
-                          className="relative inline-block bg-gray-100 rounded-full border-purple-400 border-2  hover:bg-gray-300 w-auto h-auto my-2 py-0 px-1"
+                          className="relative my-2 inline-block h-auto w-auto rounded-full  border-2 border-purple-400 bg-gray-100 px-1 py-0 hover:bg-gray-300"
                           onClick={() => setTheme("dark")}
                           alt="Dark Mode"
                         >
