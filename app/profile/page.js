@@ -19,11 +19,20 @@ export default function Profile() {
     name: "",
   });
 
+  console.log(status);
+
   useEffect(() => {
     if (status === "authenticated") {
       setUserStatus({
         status: true,
-        name: session.user.id,
+        name: session.user.name,
+        image: session.user.image,
+      });
+    } else if (status === "loading") {
+      setUserStatus({
+        status: true,
+        name: "Loading...",
+        image: "",
       });
     }
 
@@ -39,18 +48,19 @@ export default function Profile() {
             <Image
               src="https://ik.imagekit.io/alifpermanastudio/assets/profile-landing-page.png"
               fill="true"
+              style={{ objectFit: "cover" }}
             />
           </div>
           <div className="relative h-32 w-32 md:h-[200px] md:w-[200px]">
             <Image
-              src={session.user.image}
+              src={userStatus.image}
               fill="true"
               className="rounded-full border-4 border-white shadow-lg shadow-neutral-500 md:border-8"
             />
           </div>
           <div className="relative">
             <h1 className="text-center text-xl font-bold md:text-4xl">
-              Welcome back, {session.user.name}
+              Welcome back, {userStatus.name}
             </h1>
           </div>
         </div>

@@ -2,37 +2,29 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Navbar from "@/components/Navbar2";
+import { ArrowLeftCircleIcon } from "@heroicons/react/20/solid";
 /* import Navbar from "@/components/Navbar2"; */
 
 const iKUrlEndpoint = process.env.NEXT_PUBLIC_IK_ENDPOINT1;
 
 export default function UploadForm() {
+  const defaultImg = {
+    title: "Loading ...",
+    userName: "assets",
+    permalink: "dummy-image.svg",
+    uploadDate: "220304200124",
+    tags: [],
+  };
+
   const [popUp, setPopUp] = useState(false);
-  const [image, setImage] = useState([
-    {
-      title: "Loading ...",
-      permalink: "dummy-image.jpg",
-    },
-  ]);
+  const [image, setImage] = useState([defaultImg]);
   const [reload, setReload] = useState();
   const [selectedImage, setSelectedImage] = useState();
   const [selectedFile, setSelectedFile] = useState("empty");
   const [uploading, setUploading] = useState(false);
-  const [imgSubmit, setImgSubmit] = useState({
-    title: "Select your image",
-    permalink: "dummy-image.jpg",
-    tags: [],
-  });
-  const [imageDetail, setImageDetail] = useState({
-    folder: "assets",
-    permalink: "dummy-image.svg",
-    uploadDate: "220304200124",
-  });
-  const [updateImage, setUpdateImage] = useState({
-    action: "Update",
-    update: false,
-    tags: [],
-  });
+  const [imgSubmit, setImgSubmit] = useState(defaultImg);
+  const [imageDetail, setImageDetail] = useState(defaultImg);
   const [libTab, setLibTab] = useState(true);
   const [upTab, setUpTab] = useState(false);
   const [tag, setTag] = useState();
@@ -88,16 +80,21 @@ export default function UploadForm() {
 
   /* ------------------ Handle image detail update ------------------ */
 
+  useEffect(() => {
+    console.log(imageDetail);
+  }, [imageDetail]);
+
   const selectedImageDetail = (image) => {
-    const { permalink, folder, uploadDate } = image;
+    /* const { permalink, userName, uploadDate } = image; */
     setImageDetail({
-      folder: folder,
-      permalink: permalink,
-      uploadDate: uploadDate,
+      userName: image.userName,
+      permalink: image.permalink,
+      uploadDate: image.uploadDate,
     });
+
     setImgSubmit({
       fileId: image.fileId,
-      folder: image.folder,
+      userName: image.userName,
       id: image.id,
       permalink: image.permalink,
       purgeRequestId: image.purgeRequestId,
@@ -109,21 +106,7 @@ export default function UploadForm() {
     });
   };
 
-  useEffect(() => {
-    /* setUpdateImage({
-      action: "Update",
-      update: true,
-      title: imgSubmit.title,
-      permalink: imgSubmit.permalink,
-      tags: imgSubmit.tags,
-      oldPermalink: imageDetail.permalink,
-      fileId: imgSubmit.fileId,
-      uploadDate: imgSubmit.uploadDate,
-      folder: imgSubmit.folder,
-    }); */
-
-    console.log(imgSubmit);
-  }, [imgSubmit, updateTag, imageDetail]);
+  console.log(imageDetail);
 
   const handleUpdate = (e) => {
     const { name, value } = e.target;
@@ -137,7 +120,7 @@ export default function UploadForm() {
       } else if (name === "permalinkUpdate") {
         return {
           ...prevValue,
-          permalink: value,
+          permalink: value.replace(/ /g, "-"),
         };
       }
     });
@@ -182,11 +165,8 @@ export default function UploadForm() {
       if (!resPost.ok) {
         throw new Error(await resPost.text());
       }
-      setImgSubmit({
-        title: "Select your image",
-        permalink: "dummy-image.jpg",
-        tags: [],
-      });
+      setImgSubmit(defaultImg);
+      setImageDetail(defaultImg);
       setReload(true);
     } catch (err) {
       // Handle errors here
@@ -198,18 +178,11 @@ export default function UploadForm() {
   /* ------------------ Handle image delete ------------------ */
 
   const deleteImg = async (e) => {
-    const imgDelete = {
-      action: "Delete",
-      update: true,
-      title: imgSubmit.title,
-      permalink: imgSubmit.permalink,
-      tags: imgSubmit.tags,
-      oldPermalink: imageDetail.permalink,
-      fileId: imgSubmit.fileId,
-    };
-
     setUploading(true);
     e.preventDefault();
+
+    const imgDelete = imgSubmit;
+    imgDelete.action = "Delete";
 
     try {
       const resPost = await fetch("/api/imagekit", {
@@ -225,6 +198,7 @@ export default function UploadForm() {
         throw new Error(await resPost.text());
       }
       setReload(true);
+      setImageDetail(defaultImg);
     } catch (err) {
       // Handle errors here
       console.error(err);
@@ -316,6 +290,7 @@ export default function UploadForm() {
 
   return (
     <div className="relative">
+      <Navbar />
       <div
         className={
           popUp
@@ -324,8 +299,8 @@ export default function UploadForm() {
         }
       >
         <div className=" absolute h-screen w-screen bg-gray-500 opacity-60"></div>
-        <div className="absolute w-96 pt-2 md:w-[700px] lg:w-[1000px] xl:h-[520px] xl:w-[1200px]">
-          <div className="item-center mx-auto flex flex-col bg-white p-2 dark:bg-darkmode">
+        <div className="absolute w-full px-4 pt-2 lg:px-8">
+          <div className="item-center mx-auto flex max-w-[1500px] flex-col rounded-xl bg-white p-2 dark:bg-darkmode">
             <div className="mx-auto py-2 text-xl">Media Library</div>
             <div className="item-center flex flex-col">
               <div className="border-b border-gray-200 pl-4 text-gray-500 dark:border-gray-700 dark:text-gray-400">
@@ -353,22 +328,22 @@ export default function UploadForm() {
               <div className="flex flex-row justify-center">
                 <div
                   className={
-                    libTab ? "flex w-full  flex-row gap-4 p-2" : "hidden"
+                    libTab ? "relative flex w-full flex-row gap-4" : "hidden"
                   }
                 >
-                  <div className="m-0 flex basis-8/12 flex-row flex-wrap content-start justify-start overflow-y-auto  p-0 xl:h-[340px]">
+                  <div className="mx-auto flex h-[65svh] flex-row flex-wrap content-start  overflow-y-auto sm:h-[35svh] md:h-[40svh] md:basis-8/12 lg:h-[50svh] xl:h-[55svh]">
                     {image.map((image, i) => (
                       <button
                         key={i}
-                        className="m-1 border border-cyan-500 focus:bg-slate-50 focus:text-cyan-950 focus:ring"
+                        className="m-1 self-start border border-cyan-500 focus:bg-slate-50 focus:text-cyan-950 focus:ring"
                         onClick={() => selectedImageDetail(image)}
                       >
                         <Image
-                          className="h-32 w-32 object-contain"
+                          className="mx-auto h-24 w-24 object-contain"
                           src={
                             iKUrlEndpoint +
                             "/" +
-                            image.folder +
+                            image.userName +
                             "/" +
                             image.uploadDate +
                             "-" +
@@ -382,7 +357,7 @@ export default function UploadForm() {
                       </button>
                     ))}
                   </div>
-                  <div className="flex h-[340px] basis-4/12 flex-col gap-1 overflow-y-auto pr-2">
+                  <div className="hidden flex-col gap-1 overflow-y-auto pr-2 md:flex md:h-[40svh] md:basis-4/12 lg:h-[50svh] xl:h-[55svh]">
                     <h1 className="text-xl">Detail :</h1>
                     <div className=" mx-auto mb-2 w-auto border border-cyan-200 p-1">
                       <Image
@@ -390,7 +365,7 @@ export default function UploadForm() {
                         src={
                           iKUrlEndpoint +
                           "/" +
-                          imageDetail.folder +
+                          imageDetail.userName +
                           "/" +
                           imageDetail.uploadDate +
                           "-" +
@@ -403,27 +378,24 @@ export default function UploadForm() {
                     </div>
                     <p>Title :</p>
                     <input
+                      required
                       name="titleUpdate"
                       placeholder="Select your image"
-                      value={
-                        updateImage.update ? updateImage.title : imgSubmit.title
-                      }
+                      value={imgSubmit.title}
                       onChange={handleUpdate}
                     />
                     <p>Permalink :</p>
                     <input
+                      required
                       name="permalinkUpdate"
                       placeholder="Select your image"
-                      value={
-                        updateImage.update
-                          ? updateImage.permalink
-                          : imgSubmit.permalink
-                      }
+                      value={imgSubmit.permalink}
                       onChange={handleUpdate}
                     />
                     <p>Tag :</p>
                     <div className="flex flex-row">
                       <input
+                        className="rounded-l-lg text-black"
                         type="text"
                         placeholder="Your tag"
                         name="updateTag"
@@ -433,7 +405,7 @@ export default function UploadForm() {
                         value={updateTag || ""}
                       />
                       <button
-                        className="bg-blue-400 px-2"
+                        className="rounded-r-lg bg-blue-400 px-2"
                         onClick={newUpdateTag}
                       >
                         Add
@@ -481,18 +453,143 @@ export default function UploadForm() {
                       </button>
                     </div>
                   </div>
+                  {imageDetail.userName === "assets" ? (
+                    <></>
+                  ) : (
+                    <div className="absolute flex h-[65svh] w-full flex-col gap-3 overflow-y-auto bg-lightmode dark:bg-darkmode sm:h-[35svh] sm:flex-row md:hidden">
+                      <div className="fixed z-10 ml-2 hidden h-[35svh] flex-col justify-center px-2 sm:flex sm:basis-1/12">
+                        <div
+                          className="rounded-lg bg-red-500 p-2"
+                          onClick={() => setImageDetail(defaultImg)}
+                        >
+                          <h1 className="text-center">Cancel</h1>
+                          <ArrowLeftCircleIcon className="mx-auto w-8" />
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => setImageDetail(defaultImg)}
+                        className="relative mt-2 flex basis-1/12 sm:hidden"
+                      >
+                        <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 px-2 py-1">
+                          <ArrowLeftCircleIcon className="w-6" />
+                          <h1 className="text-center text-lg">Cancel </h1>
+                        </div>
+                      </div>
+                      <div className="relative flex h-[35svh] flex-col justify-center sm:basis-2/12 "></div>
+                      <div className="flex basis-6/12 flex-col">
+                        <h1 className="text-base">Detail :</h1>
+                        <div className=" mx-auto mb-2 w-auto border border-cyan-200 p-1">
+                          <Image
+                            className="h-auto max-h-72 w-full object-contain"
+                            src={
+                              iKUrlEndpoint +
+                              "/" +
+                              imageDetail.userName +
+                              "/" +
+                              imageDetail.uploadDate +
+                              "-" +
+                              imageDetail.permalink
+                            }
+                            alt={imageDetail}
+                            width={200}
+                            height={100}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex basis-5/12 flex-col">
+                        <p className="text-base">Title :</p>
+                        <input
+                          required
+                          name="titleUpdate"
+                          placeholder="Select your image"
+                          value={imgSubmit.title || ""}
+                          onChange={handleUpdate}
+                        />
+                        <p>Permalink :</p>
+                        <input
+                          required
+                          name="permalinkUpdate"
+                          placeholder="Select your image"
+                          value={imgSubmit.permalink}
+                          onChange={handleUpdate}
+                        />
+                        <p>Tag :</p>
+                        <div className="flex flex-row">
+                          <input
+                            className="rounded-l-lg text-black"
+                            type="text"
+                            placeholder="Your tag"
+                            name="updateTag"
+                            onChange={(e) => {
+                              setUpdateTag(e.target.value);
+                            }}
+                            value={updateTag || ""}
+                          />
+                          <button
+                            className="rounded-r-lg bg-blue-400 px-2"
+                            onClick={newUpdateTag}
+                          >
+                            Add
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap">
+                          {imgSubmit.tags.map((tag, i) => {
+                            return (
+                              <div
+                                key={i}
+                                className="m-1 flex flex-row rounded-md bg-blue-500"
+                              >
+                                <div className="px-2">{tag}</div>
+                                <div
+                                  className="flex flex-row rounded-r-md bg-red-600 px-2"
+                                  onClick={deleteUpdateTag}
+                                  value={updateTag}
+                                >
+                                  <Image
+                                    className="m-auto h-4 w-4"
+                                    src="/cross-sign.svg"
+                                    alt={tag || ""}
+                                    width={1}
+                                    height={1}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex flex-row content-center justify-center p-2">
+                          <button
+                            type="button"
+                            className="mb-2 me-2 rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                            onClick={deleteImg}
+                          >
+                            Delete
+                          </button>
+                          <button
+                            type="button"
+                            className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            onClick={updateImg}
+                          >
+                            Update
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div
                   className={
                     upTab
-                      ? "flex h-[350px] w-full flex-row justify-start gap-4 p-2"
+                      ? "flex h-[60svh] w-full flex-col justify-start gap-4 p-2 sm:h-[40svh] sm:flex-row lg:h-[60svh]"
                       : "hidden"
                   }
                 >
-                  <div className="flex basis-3/6 flex-col items-start p-1">
-                    <div className="pb-2 text-xl">Select your image</div>
+                  <div className="lg flex flex-col items-start overflow-y-auto p-1 sm:h-[35svh] sm:basis-3/6 md:h-[38svh] lg:h-[55svh]">
+                    <div className="pb-2 text-sm lg:text-xl">
+                      Select your image
+                    </div>
                     <label
-                      className="relative mb-1 flex aspect-video h-full w-full cursor-pointer items-center justify-center rounded-xl border-[3px] border-dashed border-gray-400 p-1"
+                      className="relative mb-1 flex aspect-video w-full cursor-pointer items-center justify-center rounded-xl border-[3px] border-dashed border-gray-400 p-1"
                       onDragOver={(e) => {
                         e.preventDefault();
                       }}
@@ -520,6 +617,7 @@ export default function UploadForm() {
                       }}
                     >
                       <input
+                        required
                         type="file"
                         hidden
                         onChange={({ target }) => {
@@ -564,15 +662,17 @@ export default function UploadForm() {
                       </div>
                     </label>
                   </div>
-                  <div className="item-start flex basis-3/6 flex-col gap-1 overflow-y-auto pt-10 text-lg">
+                  <div className="item-start flex basis-3/6 flex-col gap-1 overflow-y-auto text-sm sm:h-[35svh] md:h-[38svh] lg:h-[55svh] lg:text-lg">
                     <p>Title :</p>
                     <input
+                      required
                       placeholder="Your title"
                       onChange={(e) => setTitle(e.target.value)}
                       value={title || ""}
                     />
                     <p>Permalink :</p>
                     <input
+                      required
                       placeholder={title.replace(/ /g, "-")}
                       onChange={(e) => setPermalink(e.target.value)}
                       value={permalink || ""}
@@ -580,6 +680,7 @@ export default function UploadForm() {
                     <p>Tags :</p>
                     <div className=" flex flex-row">
                       <input
+                        className="rounded-l-lg text-black"
                         type="text"
                         placeholder="Your tag"
                         onChange={(e) => {
@@ -587,7 +688,10 @@ export default function UploadForm() {
                         }}
                         value={tag || ""}
                       />
-                      <button className="bg-blue-400 px-2" onClick={newTag}>
+                      <button
+                        className="rounded-r-lg bg-blue-400 px-2"
+                        onClick={newTag}
+                      >
                         Add
                       </button>
                     </div>
@@ -616,35 +720,46 @@ export default function UploadForm() {
                         );
                       })}
                     </div>
-
-                    <button
-                      onClick={onUpload}
-                      disabled={uploading}
-                      style={{ opacity: uploading ? ".5" : "1" }}
-                      className=" w-32 rounded bg-red-600 p-3 text-center text-white"
-                    >
-                      {uploading ? "Uploading.." : "Upload"}
-                    </button>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex flex-row content-center justify-center p-2">
-              <button
-                type="button"
-                className="mb-2 me-2 rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
-                onClick={closePopUp}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                onClick={handleSubmit}
-              >
-                Submit
-              </button>
-            </div>
+            {upTab ? (
+              <div className="flex flex-row content-center justify-center p-2">
+                <button
+                  type="button"
+                  className="mb-2 me-2 rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                  onClick={closePopUp}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onUpload}
+                  disabled={uploading}
+                  style={{ opacity: uploading ? ".5" : "1" }}
+                  className=" mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  {uploading ? "Uploading..." : "Upload"}
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-row content-center justify-center p-2">
+                <button
+                  type="button"
+                  className="mb-2 me-2 rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                  onClick={closePopUp}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

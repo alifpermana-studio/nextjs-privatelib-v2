@@ -27,7 +27,13 @@ module.exports = {
     extend: {
       colors: {
         darkmode: "#001531",
+        darkmodev2: "#00204b",
+        darkmodev3: "#002b64",
+        darkmodev4: "#00367e",
         lightmode: "#fafafa",
+        lightmodev2: "#ededed",
+        lightmodev3: "#e0e0e0",
+        lightmodev4: "#d3d3d3",
         colorone: "#EA0008",
         colortwo: "#FF383e",
         colorthree: "#0008EA",

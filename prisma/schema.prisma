@@ -52,7 +52,7 @@ model User {
 model Imagekit {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
   uploadDate     String
-  folder         String
+  userName       String
   title          String
   permalink      String
   tags           String[]

@@ -49,7 +49,7 @@ export async function POST(req) {
       file: data.imageData,
       fileName: mergeTitle + "-" + data.permalink,
       useUniqueFileName: false,
-      folder: "/" + session.user.userName,
+      userName: "/" + session.user.userName,
     });
 
     const upDBResult = await prisma.Imagekit.create({
@@ -58,7 +58,7 @@ export async function POST(req) {
         uploadDate: mergeTitle,
         permalink: data.permalink,
         tags: data.tags,
-        folder: session.user.userName,
+        userName: session.user.userName,
         fileId: res.fileId,
         purgeRequestId: "0",
         userId: session.user.id,
