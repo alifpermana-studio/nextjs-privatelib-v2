@@ -13,10 +13,29 @@ export default function DragAndDrop() {
   const [arrayContent, setArrayContent] = useState([defaultArray]);
   const [cOffX, setCOffX] = useState();
   const [cOffY, setCOffY] = useState();
+  const [dragMove, setDragMove] = useState(false);
+  const [text, setText] = useState("<div></div>");
+
+  useEffect(() => {
+    const parser = new DOMParser();
+    /* const html = parser.parseFromString(
+      "<p>" + result.replaceAll(/\n/g, "</p><p>"),
+      "text/html",
+    ); */
+
+    arrayContent.map((arr, i) => {
+      const html = parser.parseFromString(
+        "<p>" + arr.content.replaceAll(/\n/g, "</p><p>"),
+        "text/html",
+      );
+
+      setText(html.body.innerHTML);
+
+      document.getElementById("textarea-" + i).innerText = html.body.innerText;
+    });
+  }, [dragMove]);
 
   const newContent = () => {
-    setTotalContent(totalContent + 1);
-
     const newArr = defaultArray;
 
     setArrayContent((prevContent) => {
@@ -31,23 +50,22 @@ export default function DragAndDrop() {
   };
 
   const handleContent = (e) => {
-    const { value, id } = e.target;
+    const { innerText, id } = e.target;
     const textarea = document.getElementById(id);
     const contentarea = document.getElementById(
       id.replace("textarea-", "content-"),
     );
 
     let newArr = [...arrayContent];
-    newArr[id.replace("textarea-", "")].content = value;
-    newArr[id.replace("textarea-", "")].height = e.target.scrollHeight;
+    newArr[id.replace("textarea-", "")].content = innerText;
 
-    textarea.style.height = "46px";
+    /* newArr[id.replace("textarea-", "")].height = e.target.scrollHeight; */
 
-    console.dir(contentarea.style);
+    /* textarea.style.height = "46px"; */
 
-    let scHeight = e.target.scrollHeight;
+    /* let scHeight = e.target.scrollHeight;
     textarea.style.height = `${scHeight}px`;
-    contentarea.style.height = `${scHeight + 16}px`;
+    contentarea.style.height = `${scHeight + 16}px`; */
 
     setArrayContent(newArr);
   };
@@ -78,14 +96,15 @@ export default function DragAndDrop() {
     contentarea.style.opacity = "0";
     contentarea.style.position = "absolute";
 
-    draggingarea.style.height = "46px";
+    /* draggingarea.style.height = "46px"; */
 
-    const scHeight = textarea.scrollHeight;
+    /* const scHeight = textarea.scrollHeight; */
 
     let newArr = [...arrayContent];
 
-    newArr[e.target.id.replace("drag-", "")].height = scHeight;
+    /* newArr[e.target.id.replace("drag-", "")].height = scHeight; */
 
+    setDragMove(true);
     setArrayContent(newArr);
 
     e.dataTransfer.setData(
@@ -93,7 +112,7 @@ export default function DragAndDrop() {
       JSON.stringify({
         mouseMove: 1,
         id: e.target.id.replace("drag-", ""),
-        scrollHeight: arrayContent.height,
+        /* scrollHeight: arrayContent.height, */
       }),
     );
   };
@@ -160,7 +179,7 @@ export default function DragAndDrop() {
       return arr;
     }
 
-    function heightAll(myArr) {
+    /* function heightAll(myArr) {
       myArr.map((arr, i) => {
         const mytextarea = document.getElementById("textarea-" + i);
         const mycontentarea = document.getElementById("content-" + i);
@@ -171,20 +190,22 @@ export default function DragAndDrop() {
 
         mycontentarea.style.height = `${contentAreaHeight + 16}px`;
       });
-    }
+    } */
 
     let newArr = [...arrayContent];
 
     if (myArray > myTag) {
       newArr[myTag].drag = false;
       const result = array_move(newArr, myArray, myTag + 1);
-      heightAll(result);
+      /* heightAll(result); */
       setArrayContent(result);
     } else {
       newArr[myTag].drag = false;
       const result = array_move(newArr, myArray, myTag);
-      heightAll(result);
+      /* heightAll(result); */
+
       setArrayContent(result);
+      setDragMove(false);
     }
   };
 
@@ -260,13 +281,12 @@ export default function DragAndDrop() {
                 >
                   Drag
                 </div>
-                <textarea
-                  className="no-scrollbar h-11 w-80 resize-none rounded-lg bg-lightmodev3 p-2 text-darkmode dark:bg-darkmodev3 dark:text-lightmode"
+                <div
+                  className=" w-80 rounded-lg bg-lightmodev3 p-2 text-darkmode dark:bg-darkmodev3 dark:text-lightmode"
                   id={"textarea-" + i}
-                  placeholder="Your content here..."
-                  onChange={handleContent}
-                  value={content.content}
-                ></textarea>
+                  onKeyUp={handleContent}
+                  contentEditable="true"
+                ></div>
                 <div id={"delete-" + i} onClick={deleteContent}>
                   Delete
                 </div>
