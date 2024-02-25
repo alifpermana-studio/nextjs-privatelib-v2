@@ -33,6 +33,7 @@ export default function SlateEditor() {
   }, []); */
 
   const renderElement = useCallback((props) => {
+    /* console.dir(props); */
     return <EditableElement {...props} />;
   }, []);
 
@@ -136,6 +137,11 @@ export default function SlateEditor() {
         </Slate>
         <button onClick={() => console.dir(editor)}>submit</button>
       </div>
+      <ol className="list-inside list-decimal">
+        <li>Coffee</li>
+        <li>Tea</li>
+        <li>Milk</li>
+      </ol>
     </div>
   );
 }
@@ -321,6 +327,8 @@ const Toolbar = (editor) => {
         onMouseDown={(e) => {
           e.preventDefault();
           CustomEditor.toggleOrderListBlock(editor);
+          //First, loop editor on each children for <li/> tag, and return as element
+          //Second, loop editor on single element for <ol/> tag
         }}
       >
         <svg
@@ -448,13 +456,23 @@ const Toolbar = (editor) => {
       >
         Wrapnode
       </button>
+      <button
+        title="W"
+        className=" rounded-md bg-lightmodev4 p-1 dark:bg-darkmodev4"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          CustomEditor.toggleUnwrapNodeBlock(editor);
+        }}
+      >
+        unwrapNodes
+      </button>
     </div>
   );
 };
 
 const EditableElement = ({ attributes, children, element }) => {
   const style = { textAlign: element.align };
-  console.dir(element);
+  console.dir(children);
   switch (element.type) {
     case "quote":
       return (
@@ -486,9 +504,9 @@ const EditableElement = ({ attributes, children, element }) => {
           {children}
         </li>
       );
-    case "ordered-list":
+    case "order-list":
       return (
-        <ol style={style} {...attributes}>
+        <ol style={style} className="list-inside list-decimal" {...attributes}>
           {children}
         </ol>
       );
@@ -590,7 +608,15 @@ const CustomEditor = {
 
   isOrderListActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: (n) => n.type === "ordered-list",
+      match: (n) => n.type === "order-list",
+    });
+
+    return !!match;
+  },
+
+  isListItemActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "list-item",
     });
 
     return !!match;
@@ -735,7 +761,41 @@ const CustomEditor = {
   },
 
   toggleWrapNodeBlock(editor) {
-    const block = { type: "format", children: [] };
-    Transforms.wrapNodes(editor, block);
+    const isActive = CustomEditor.isOrderListActive(editor);
+    const block = { type: isActive ? "paragraph" : "order-list", children: [] };
+
+    console.dir(editor);
+  },
+
+  toggleUnwrapNodeBlock(editor) {
+    const isOrderActive = CustomEditor.isOrderListActive(editor);
+    const isListActive = CustomEditor.isListItemActive(editor);
+    const block = {
+      type: isOrderActive ? "paragraph" : "order-list",
+      children: [],
+    };
+
+    /* Transforms.unwrapNodes(editor, {
+      match: (n) => !Element.isElement(n) && Editor.isEditor(editor, n),
+      split: true,
+    }); */
+
+    //this
+
+    Transforms.setNodes(editor, {
+      type: isListActive ? "paragraph" : "list-item",
+    });
+
+    if (!isOrderActive) {
+      Transforms.wrapNodes(editor, {
+        type: "order-list",
+        children: [],
+      });
+    } else {
+      Transforms.liftNodes(editor, {
+        type: "paragraph",
+        children: [],
+      });
+    }
   },
 };
