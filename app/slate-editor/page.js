@@ -327,8 +327,6 @@ const Toolbar = (editor) => {
         onMouseDown={(e) => {
           e.preventDefault();
           CustomEditor.toggleOrderListBlock(editor);
-          //First, loop editor on each children for <li/> tag, and return as element
-          //Second, loop editor on single element for <ol/> tag
         }}
       >
         <svg
@@ -354,7 +352,7 @@ const Toolbar = (editor) => {
         className=" h-6 w-6 rounded-md bg-lightmodev4 p-1 dark:bg-darkmodev4"
         onMouseDown={(e) => {
           e.preventDefault();
-          CustomEditor.toggleBoldMark(editor);
+          CustomEditor.toggleUnorderListBlock(editor);
         }}
       >
         <svg
@@ -510,6 +508,12 @@ const EditableElement = ({ attributes, children, element }) => {
           {children}
         </ol>
       );
+    case "unorder-list":
+      return (
+        <ul style={style} className="list-inside list-disc" {...attributes}>
+          {children}
+        </ul>
+      );
     case "code":
       return (
         <code style={style} {...attributes}>
@@ -590,6 +594,14 @@ const CustomEditor = {
 
   //This function, we check is editor have type "code" or not.
   //If its have, then return false, otherwise return true
+  isParagraphBlockActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "paragraph",
+    });
+
+    return !!match;
+  },
+
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
       match: (n) => n.type === "code",
@@ -609,6 +621,14 @@ const CustomEditor = {
   isOrderListActive(editor) {
     const [match] = Editor.nodes(editor, {
       match: (n) => n.type === "order-list",
+    });
+
+    return !!match;
+  },
+
+  isUnorderListActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "unorder-list",
     });
 
     return !!match;
@@ -676,7 +696,7 @@ const CustomEditor = {
     }
   },
 
-  //This setNode function submit specific editor value to element nodes
+  //This setNode function submit specific node structure and value to element.
   toggleCodeBlock(editor) {
     const isActive = CustomEditor.isCodeBlockActive(editor);
     Transforms.setNodes(
@@ -750,40 +770,21 @@ const CustomEditor = {
   },
 
   toggleOrderListBlock(editor) {
-    const isActive = CustomEditor.isOrderListActive(editor);
-    Transforms.setNodes(
-      editor,
-      { type: isActive ? "paragraph" : "ordered-list" },
-      {
-        match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
-      },
-    );
-  },
-
-  toggleWrapNodeBlock(editor) {
-    const isActive = CustomEditor.isOrderListActive(editor);
-    const block = { type: isActive ? "paragraph" : "order-list", children: [] };
-
-    console.dir(editor);
-  },
-
-  toggleUnwrapNodeBlock(editor) {
+    //First, loop editor on each children for <li/> tag, and return as element
+    //Second, loop editor on single element for <ol/> tag
     const isOrderActive = CustomEditor.isOrderListActive(editor);
-    const isListActive = CustomEditor.isListItemActive(editor);
-    const block = {
-      type: isOrderActive ? "paragraph" : "order-list",
-      children: [],
-    };
+    const LIST_TYPES = ["unorder-list", "order-list"];
 
-    /* Transforms.unwrapNodes(editor, {
-      match: (n) => !Element.isElement(n) && Editor.isEditor(editor, n),
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        Element.isElement(n) &&
+        !Editor.isEditor(n) &&
+        LIST_TYPES.includes(n.type),
       split: true,
-    }); */
-
-    //this
+    });
 
     Transforms.setNodes(editor, {
-      type: isListActive ? "paragraph" : "list-item",
+      type: isOrderActive ? "paragraph" : "list-item",
     });
 
     if (!isOrderActive) {
@@ -791,9 +792,30 @@ const CustomEditor = {
         type: "order-list",
         children: [],
       });
-    } else {
-      Transforms.liftNodes(editor, {
-        type: "paragraph",
+    }
+  },
+
+  toggleUnorderListBlock(editor) {
+    //First, loop editor on each children for <li/> tag, and return as element
+    //Second, loop editor on single element for <ul/> tag
+    const isUnorderActive = CustomEditor.isUnorderListActive(editor);
+    const LIST_TYPES = ["order-list", "unorder-list"];
+
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        Element.isElement(n) &&
+        !Editor.isEditor(n) &&
+        LIST_TYPES.includes(n.type),
+      split: true,
+    });
+
+    Transforms.setNodes(editor, {
+      type: isUnorderActive ? "paragraph" : "list-item",
+    });
+
+    if (!isUnorderActive) {
+      Transforms.wrapNodes(editor, {
+        type: "unorder-list",
         children: [],
       });
     }
